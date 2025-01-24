@@ -14,5 +14,4 @@ public class Bubble : MonoBehaviour
         //Add force to the bubble
         rigidbody.AddForce(Vector3.up);
     }
-
 }
