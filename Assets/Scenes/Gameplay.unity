@@ -318,6 +318,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 443801061371848759}
     - target: {fileID: 4848552851056387715, guid: 27e5dff7528ea5147b3302be04998521, type: 3}
+      propertyPath: bubbleLostAudioResource
+      value: 
+      objectReference: {fileID: 6418180475301049370, guid: 7c19e60e5c2aaed419c31df373c9a08d, type: 2}
+    - target: {fileID: 4848552851056387715, guid: 27e5dff7528ea5147b3302be04998521, type: 3}
       propertyPath: bubbleVictoryAudioResource
       value: 
       objectReference: {fileID: 8300000, guid: 73affd18dfd08d946a09e00c3ed43256, type: 3}

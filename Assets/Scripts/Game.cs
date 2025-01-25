@@ -38,6 +38,9 @@ public class Game : MonoBehaviour
     [SerializeField, Tooltip("The voice being played whenever the bubble is free.")]
     private AudioResource bubbleVictoryAudioResource;
 
+    [SerializeField, Tooltip("The voice being played whenever the bubble loses.")]
+    private AudioResource bubbleLostAudioResource;
+
     /// <summary>
     /// Timestamp for starting the game
     /// </summary>
@@ -52,6 +55,9 @@ public class Game : MonoBehaviour
     /// The current GameState of the game
     /// </summary>
     internal GameState CurrentGameState = GameState.INTRO;
+
+    private bool lostGame = false;
+
 
     /// <summary>
     /// Called from the start, Starts the game right away on scene load
@@ -128,7 +134,7 @@ public class Game : MonoBehaviour
 
                 mainCameraAnimator.enabled = false;
 
-                GlobalAudio.Instance.PlayAudioResource(bubbleVictoryAudioResource);
+                GlobalAudio.Instance.PlayAudioResource(lostGame ? bubbleLostAudioResource : bubbleVictoryAudioResource);
                 CameraHandler.Instance.FocusOnPlayer();
 
                 Bubble firstPlayerBubble = PlayerManager.Instance?.Players[0]?.Bubble;
@@ -139,10 +145,33 @@ public class Game : MonoBehaviour
                 StartCoroutine(DoOutroAnimation());
                 IEnumerator DoOutroAnimation()
                 {
-                    firstPlayerBubble.SetExpression(Bubble.Expression.Normal, 4.5f);
-                    yield return new WaitForSeconds(4.5f);
+                    if (!lostGame)
+                    {
+                        firstPlayerBubble.SetExpression(Bubble.Expression.Normal, 4.5f);
+                        yield return new WaitForSeconds(4.5f);
 
-                    firstPlayerBubble.ExecuteTwerk();
+                        firstPlayerBubble.ExecuteTwerk();
+                    }
+                    else
+                    {
+                        float expressionLength = 2;
+                        firstPlayerBubble.SetExpression(Bubble.Expression.Impact, expressionLength);
+
+                        float currValue = 0;
+                        Vector3 fromScale = firstPlayerBubble.transform.localScale;
+                        Vector3 toScale = Vector3.zero;
+
+                        while (currValue < 1)
+                        {
+                            currValue += Time.deltaTime / expressionLength;
+                            firstPlayerBubble.transform.localScale = Vector3.Lerp(fromScale, toScale, currValue);
+
+                            if (currValue >= 1)
+                                firstPlayerBubble.transform.localScale = toScale;
+
+                            yield return null;
+                        }
+                    }
                 }
             }
         }
@@ -177,10 +206,12 @@ public class Game : MonoBehaviour
     /// <summary>
     /// This function executes the losing sequence
     /// </summary>
+    [ContextMenu("Lose Game")]
     private void LoseGame()
     {
         //Indicate that the game has finished
         UpdateGameState(GameState.OUTRO);
+        lostGame = true;
 
         //Send lose signal to the Animator
         gameUIAnimator.SetTrigger("Lose Game");
