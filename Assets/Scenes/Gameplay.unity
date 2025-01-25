@@ -169,6 +169,7 @@ MonoBehaviour:
   countdownText: {fileID: 1461675034}
   gameTimeText: {fileID: 1815229035}
   startGameText: {fileID: 2025553907}
+  gameLostText: {fileID: 0}
   gameUIAnimator: {fileID: 1597134779}
 --- !u!1 &443410287
 GameObject:
@@ -341,8 +342,8 @@ Camera:
   m_GameObject: {fileID: 951987642}
   m_Enabled: 1
   serializedVersion: 2
-  m_ClearFlags: 1
-  m_BackGroundColor: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 0}
+  m_ClearFlags: 2
+  m_BackGroundColor: {r: 0.36862746, g: 0.29411766, b: 0.29411766, a: 0}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0
@@ -454,6 +455,11 @@ MonoBehaviour:
     m_MipBias: 0
     m_VarianceClampScale: 0.9
     m_ContrastAdaptiveSharpening: 0
+--- !u!4 &1017148226 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 5714136844063908035, guid: f5f4286e2ae3e7e4b940505aa6733e26, type: 3}
+  m_PrefabInstance: {fileID: 7026008120647965940}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1461675032
 GameObject:
   m_ObjectHideFlags: 0
@@ -1102,6 +1108,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 171682184107078484, guid: 5297366b48054824db4d65ddeea1e63c, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 1617201822624239643, guid: 5297366b48054824db4d65ddeea1e63c, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -1117,6 +1127,10 @@ PrefabInstance:
     - target: {fileID: 1970950231834932577, guid: 5297366b48054824db4d65ddeea1e63c, type: 3}
       propertyPath: m_LocalPosition.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2359164031854126623, guid: 5297366b48054824db4d65ddeea1e63c, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2811458943969271637, guid: 5297366b48054824db4d65ddeea1e63c, type: 3}
       propertyPath: m_Name
@@ -1186,6 +1200,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4809866542893871296, guid: 5297366b48054824db4d65ddeea1e63c, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 7105542405370883913, guid: 5297366b48054824db4d65ddeea1e63c, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
@@ -1205,15 +1223,15 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1004961656624146171, guid: f5f4286e2ae3e7e4b940505aa6733e26, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -0.46
+      value: 0.56
       objectReference: {fileID: 0}
     - target: {fileID: 1004961656624146171, guid: f5f4286e2ae3e7e4b940505aa6733e26, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 1.084
+      value: 1.99
       objectReference: {fileID: 0}
     - target: {fileID: 1004961656624146171, guid: f5f4286e2ae3e7e4b940505aa6733e26, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -0
+      value: 0.044
       objectReference: {fileID: 0}
     - target: {fileID: 1004961656624146171, guid: f5f4286e2ae3e7e4b940505aa6733e26, type: 3}
       propertyPath: m_LocalRotation.w
@@ -1247,6 +1265,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Bubble
       objectReference: {fileID: 0}
+    - target: {fileID: 9111316273228769700, guid: f5f4286e2ae3e7e4b940505aa6733e26, type: 3}
+      propertyPath: VisualsRoot
+      value: 
+      objectReference: {fileID: 1017148226}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
