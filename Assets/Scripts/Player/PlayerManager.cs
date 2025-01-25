@@ -132,7 +132,6 @@ namespace SpiritLevel.Player
             return false;
         }
 
-
         public void SendData(string data)
         {
             webSocket.SendText(data);
