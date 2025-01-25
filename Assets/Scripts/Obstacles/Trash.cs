@@ -2,7 +2,6 @@
 using UnityEngine.Timers;
 using UnityEngine.UI;
 using SpiritLevel.Networking;
-using SpiritLevel.Player;
 
 public class Trash : Obstacle
 {
@@ -27,7 +26,6 @@ public class Trash : Obstacle
         {
             BubbleRigidbody = collision.gameObject.GetComponent<Rigidbody>();
             if (BubbleRigidbody == null)
-                Debug.LogError("No bubble");
             BubbleRigidbody.Sleep();
             canStartShaking = true;
             StartShaking();

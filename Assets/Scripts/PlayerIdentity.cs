@@ -6,6 +6,7 @@ namespace SpiritLevel
     [Serializable]
     public class PlayerIdentity
     {
+        public int PlayerIndex;
         public string UUID;
         public PlayerInput Input = new PlayerInput();
     }
