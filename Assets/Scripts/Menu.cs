@@ -11,7 +11,6 @@ public class Menu : MonoBehaviour
     [SerializeField]
     private int gameplayLevelIndex;
 
-
     public void GoToGameplayScene()
     {
         SceneManager.LoadScene(gameplayLevelIndex);
