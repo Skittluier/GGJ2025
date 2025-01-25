@@ -671,11 +671,10 @@ MonoBehaviour:
       m_Calls: []
   m_text: 'Scan to join
 
-
     Room Code: {0}'
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 2e8bfa9254efa4741a7972b145dc9335, type: 2}
-  m_sharedMaterial: {fileID: 4815944603173069565, guid: 2e8bfa9254efa4741a7972b145dc9335, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 842503f4afb9af64e9597e2f4aecc09e, type: 2}
+  m_sharedMaterial: {fileID: -1517624738329050883, guid: 842503f4afb9af64e9597e2f4aecc09e, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
