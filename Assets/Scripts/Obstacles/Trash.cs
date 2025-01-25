@@ -23,6 +23,7 @@ public class Trash : Obstacle
     private bool canStartShaking;
     private bool startedTimer;
     public Slider progressBar;
+    public float ProgressAddingValue = 0.01f;
     private void OnTriggerEnter(Collider collision)
     {
         var hitLayerMask = 1 << collision.gameObject.layer;
@@ -69,13 +70,13 @@ public class Trash : Obstacle
         PlayerManager.Instance.SendData(data);
     }
 
-    public void Update()
+    public void LateUpdate()
     {
         if (canStartShaking)
         {
             if (StillShaking())
             {
-                progressBar.value += 0.1f;
+                progressBar.value += ProgressAddingValue;
             }
         }
     }
