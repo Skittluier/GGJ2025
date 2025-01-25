@@ -78,7 +78,7 @@ namespace SpiritLevel.Player
 
                 if (sMessage.type == ServerMessageType.PLAYER_JOINED)
                 {
-                    PlayerIdentity player = new PlayerIdentity() { UUID = playerStatusUpdateData.data.uuid };
+                    PlayerIdentity player = new PlayerIdentity() { UUID = playerStatusUpdateData.data.uuid, ID = playerStatusUpdateData.data.id };
                     Players.Add(player);
 
                     OnPlayerJoined?.Invoke(player);
