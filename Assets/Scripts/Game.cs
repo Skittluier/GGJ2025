@@ -114,8 +114,8 @@ public class Game : MonoBehaviour
 
     public enum GameState
     {
-        1,
-        2,
-        3,
+        Intro,
+        Gameplay,
+        Outro,
     }
 }
