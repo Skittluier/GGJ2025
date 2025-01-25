@@ -1,6 +1,8 @@
 ﻿using UnityEngine;
 using UnityEngine.Timers;
 using UnityEngine.UI;
+using SpiritLevel.Networking;
+using SpiritLevel.Input;
 
 public class Trash : Obstacle
 {
@@ -50,6 +52,14 @@ public class Trash : Obstacle
         startTime = Time.time;
         progressBar.value = 0;
         progressBar.gameObject.SetActive(true);
+        UnityMessage<object> message = new UnityMessage<object>()
+        {
+            type = UnityMessageType.VIBRATION_START,
+            data = 5000f
+        };
+        object data = Newtonsoft.Json.JsonConvert.SerializeObject(message);
+
+        InputManager.Instance.SendHapticFeedback(data);
     }
 
     public void Update()

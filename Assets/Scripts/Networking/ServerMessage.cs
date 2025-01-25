@@ -5,6 +5,11 @@ namespace SpiritLevel.Networking
         PLAYER_JOINED, PLAYER_LEFT, PLAYER_INPUT
     }
 
+    public enum UnityMessageType
+    {
+        VIBRATION_START, VIBRATION_END 
+    }
+
     public class ServerMessage<T>
     {
         public ServerMessageType type;
@@ -14,5 +19,11 @@ namespace SpiritLevel.Networking
     public class ServerMessage
     {
         public ServerMessageType type;
+    }
+
+    public class UnityMessage<T>
+    {
+        public UnityMessageType type;
+        public T data;
     }
 }
