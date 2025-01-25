@@ -39,7 +39,7 @@ public class Bubble : MonoBehaviour
         UpdateBillboarding();
 
         //Update bubble position in the world based on its player index
-        Shader.SetGlobalVector(string.Format("_BubblePosition{0}", player.PlayerIndex), transform.position);
+        Shader.SetGlobalVector(string.Format("_BubblePosition{0}", player.ID), transform.position);
     }
 
     /// <summary>

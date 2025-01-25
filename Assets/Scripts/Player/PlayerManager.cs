@@ -74,7 +74,7 @@ namespace SpiritLevel.Player
             {
                 ServerMessage<PlayerStatusUpdateData> playerStatusUpdateData = Newtonsoft.Json.JsonConvert.DeserializeObject<ServerMessage<PlayerStatusUpdateData>>(result);
 
-                Debug.Log($"[InputManager] Player Status Update: {playerStatusUpdateData.type} | UUID: {playerStatusUpdateData.data.uuid}");
+                Debug.Log($"[InputManager] Player Status Update: {playerStatusUpdateData.type} | ID: {playerStatusUpdateData.data.id} | UUID: {playerStatusUpdateData.data.uuid}");
 
                 if (sMessage.type == ServerMessageType.PLAYER_JOINED)
                 {

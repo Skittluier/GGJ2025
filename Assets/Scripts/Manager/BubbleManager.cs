@@ -36,7 +36,7 @@ public class BubbleManager : MonoBehaviour
         GameObject player = GameObject.Instantiate(bubblePrefab,null);
         Bubble bubble = player.GetComponent<Bubble>();
         bubble.player.UUID = playerID.UUID;
-        bubble.player.PlayerIndex = playerID.PlayerIndex;
+        bubble.player.ID = playerID.ID;
         player.transform.position = startPosition[bubbleList.Count].position;
         bubbleList.Add(playerID);
     }

@@ -2,6 +2,7 @@ namespace SpiritLevel.Networking
 {
     public class InputData
     {
+        public int id;
         public string uuid;
         public float alpha;
         public float beta;
