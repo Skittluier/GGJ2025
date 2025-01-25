@@ -7,7 +7,7 @@ namespace SpiritLevel.Networking
 
     public enum UnityMessageType
     {
-        VIBRATION_START, VIBRATION_END 
+        VIBRATION_START, VIBRATION_STOP 
     }
 
     public class ServerMessage<T>

@@ -110,8 +110,15 @@ namespace SpiritLevel.Player
         }
 
         public void SendHapticFeedback<T>(string uuid, byte[] data)
+        
+        public void SendData(string data )
         {
+            webSocket.SendText(data);
+        }
 
+        public void SendUnityMessage(string data)
+        {
+            webSocket.SendText(data);
         }
 
         private void WebSocket_OnClose(WebSocketCloseCode closeCode)
