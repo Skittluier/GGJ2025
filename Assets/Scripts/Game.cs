@@ -139,8 +139,8 @@ public class Game : MonoBehaviour
                 StartCoroutine(DoOutroAnimation());
                 IEnumerator DoOutroAnimation()
                 {
-                    firstPlayerBubble.SetExpression(Bubble.Expression.Blink, 6f);
-                    yield return new WaitForSeconds(6f);
+                    firstPlayerBubble.SetExpression(Bubble.Expression.Normal, 4.5f);
+                    yield return new WaitForSeconds(4.5f);
 
                     firstPlayerBubble.ExecuteTwerk();
                 }
