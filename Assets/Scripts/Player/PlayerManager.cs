@@ -15,9 +15,9 @@ namespace SpiritLevel.Player
         private string webSocketURL;
 
         [field: SerializeField, ReadOnly]
-        internal List<Player> Players { get; private set; } = new List<Player>();
+        internal List<PlayerIdentity> Players { get; private set; } = new List<PlayerIdentity>();
 
-        internal delegate void OnPlayerJoinedMethod(Player player);
+        internal delegate void OnPlayerJoinedMethod(PlayerIdentity player);
         internal OnPlayerJoinedMethod OnPlayerJoined;
 
         internal delegate void OnPlayerLeftMethod(string playerUUID);
@@ -76,7 +76,7 @@ namespace SpiritLevel.Player
 
                 if (sMessage.type == ServerMessageType.PLAYER_JOINED)
                 {
-                    Player player = new Player() { UUID = playerStatusUpdateData.data.uuid };
+                    PlayerIdentity player = new PlayerIdentity() { UUID = playerStatusUpdateData.data.uuid };
                     Players.Add(player);
 
                     OnPlayerJoined?.Invoke(player);

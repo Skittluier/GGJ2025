@@ -4,7 +4,7 @@ namespace SpiritLevel
     using System;
 
     [Serializable]
-    public class Player
+    public class PlayerIdentity
     {
         public string UUID;
         public PlayerInput Input = new PlayerInput();
