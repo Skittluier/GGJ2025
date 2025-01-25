@@ -35,6 +35,25 @@ public class Waterpas : MonoBehaviour
     {
         if (webSocket != null)
             webSocket.DispatchMessageQueue();
+
+        //Stop processing input if the game hasn't started yet
+        if (Game.Instance?.GameStarted != true)
+            return;
+
+        float horizontalInput = Input.GetAxis("Horizontal");
+        float verticalInput = Input.GetAxis("Vertical");
+
+        //Assign input vector
+        lastInput = new Vector2(horizontalInput, verticalInput);
+    }
+
+    private void FixedUpdate()
+    {
+        //Get the current rotation
+        Quaternion currentRotation = rigidBody.rotation;
+
+        rigidBody.AddRelativeTorque(new Vector3(lastInput.x * rotationStrength, 0, 0), ForceMode.Impulse);
+        rigidBody.AddRelativeTorque(new Vector3(0, 0, lastInput.y * rotationStrength), ForceMode.Impulse);
     }
 
     private void WebSocket_OnMessage(byte[] data)
@@ -76,21 +95,4 @@ public class Waterpas : MonoBehaviour
         await webSocket.Close();
     }
 
-    //private void Update()
-    //{
-    //    float horizontalInput = Input.GetAxis("Horizontal");
-    //    float verticalInput = Input.GetAxis("Vertical");
-
-    //    //Assign input vector
-    //    lastInput = new Vector2(horizontalInput, verticalInput);
-    //}
-
-    //private void FixedUpdate()
-    //{
-    //    //Get the current rotation
-    //    Quaternion currentRotation = rigidBody.rotation;
-
-    //    rigidBody.AddRelativeTorque(new Vector3(lastInput.x * rotationStrength, 0, 0), ForceMode.Impulse);
-    //    rigidBody.AddRelativeTorque(new Vector3(0, 0, lastInput.y * rotationStrength), ForceMode.Impulse);
-    //}
 }

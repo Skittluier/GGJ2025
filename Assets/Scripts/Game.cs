@@ -3,6 +3,9 @@ using UnityEngine;
 
 public class Game : MonoBehaviour
 {
+    //Nicely exposed singleton
+    public static Game Instance;
+
     [SerializeField, Tooltip("The max amount of time allowed for the round")]
     private float roundTime = 60f;
 
@@ -12,22 +15,38 @@ public class Game : MonoBehaviour
     [SerializeField, Tooltip("Text component to show the countdown before starting the game")]
     private TextMeshProUGUI countdownText;
 
+    [SerializeField, Tooltip("Text component to show the current time left for the round")]
+    private TextMeshProUGUI gameTimeText;
+
+    [SerializeField, Tooltip("Text that shows that the players can start the game")]
+    private TextMeshProUGUI startGameText;
+
+    [SerializeField, Tooltip("Animator that controls the in-game UI")]
+    private Animator gameUIAnimator;
+
     /// <summary>
     /// Timestamp for starting the game
     /// </summary>
     private float startingTimestamp = 0f;
 
     /// <summary>
+    /// Timestamp for when the game round is over, is being set when the game start
+    /// </summary>
+    private float endGameTimestamp = 0f;
+
+    /// <summary>
     /// Boolean to show if the game has started
     /// </summary>
-    private bool gameStarted = false;
+    internal bool GameStarted = false;
 
     /// <summary>
     /// Called from the start, Starts the game right away on scene load
     /// </summary>
     private void Start()
     {
-        gameStarted = false;
+        Instance = this;
+
+        GameStarted = false;
         startingTimestamp = countdownTime;
     }
 
@@ -36,24 +55,43 @@ public class Game : MonoBehaviour
     /// </summary>
     private void Update()
     {
-        //If a starting timestamp is present, apply game cooldown
-        if (startingTimestamp > 0)
+        //If the game hasn't started, perform startup logic
+        if (!GameStarted)
         {
-            //Sustract time yo
-            startingTimestamp = Mathf.Clamp(startingTimestamp - Time.deltaTime, 0, countdownTime);
+            //If a starting timestamp is present, apply game cooldown
+            if (startingTimestamp > 0)
+            {
+                //Sustract time yo
+                startingTimestamp = Mathf.Clamp(startingTimestamp - Time.deltaTime, 0, countdownTime);
 
-            //Apply text to countdown text
-            countdownText.gameObject.SetActive(true);
-            countdownText.text = string.Format("Starting game in: {0:0.0} seconds!", startingTimestamp);
+                //Apply text to countdown text
+                countdownText.gameObject.SetActive(true);
+                countdownText.text = string.Format("Starting game in: {0:0.0} seconds!", startingTimestamp);
+            }
+            else if (startingTimestamp <= 0)
+            {
+                //send start game signal to game UI
+                gameUIAnimator.SetTrigger("Start Game");
+
+                //Disable countdown text and start the game!
+                countdownText.gameObject.SetActive(false);
+
+                //Start the game already!
+                StartGame();
+            }
         }
-        else if (startingTimestamp <= 0 && !gameStarted)
+        //Perform game logic for when the game is running
+        else if (GameStarted)
         {
-            //Disable countdown text and start the game!
-            countdownText.gameObject.SetActive(false);
+            //Lower the current game time
+            endGameTimestamp -= Mathf.Clamp(endGameTimestamp - Time.deltaTime, 0, roundTime);
 
-            //Start the game already!
-            StartGame();
+            //Update amount of time left in the game on the in-game UI
+            gameTimeText.text = string.Format("You have: {0:0.0} seconds left!",endGameTimestamp);
+        
+        
         }
+
     }
 
     /// <summary>
@@ -62,6 +100,22 @@ public class Game : MonoBehaviour
     private void StartGame()
     {
         //Indicate that the game has started
-        gameStarted = true;
+        GameStarted = true;
+    }
+
+    /// <summary>
+    /// Ends the currrent gameplay session
+    /// </summary>
+    private void EndGame()
+    {
+        //Indicate that the game has finished
+        GameStarted = false;
+    }
+
+    public enum GameState
+    {
+        1,
+        2,
+        3,
     }
 }
