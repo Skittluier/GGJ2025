@@ -3,9 +3,9 @@ namespace SpiritLevel.Input
     using NativeWebSocket;
     using SpiritLevel.Networking;
     using System.Collections.Generic;
-    using System.Linq;
+    using System.Threading.Tasks;
+    using Unity.Collections;
     using UnityEngine;
-    using UnityEngine.Windows;
 
     public class InputManager : MonoBehaviour
     {
@@ -14,10 +14,13 @@ namespace SpiritLevel.Input
         [SerializeField, Tooltip("The websocket URL for the controls.")]
         private string webSocketURL;
 
-        private List<PlayerInput> inputs = new List<PlayerInput>();
+        [SerializeField, ReadOnly]
+        private List<Player> players = new List<Player>();
+
+        private bool tryingToConnect = false;
 
 
-        private async void Start()
+        private void Start()
         {
             webSocket = new WebSocket(webSocketURL);
 
@@ -25,14 +28,15 @@ namespace SpiritLevel.Input
             webSocket.OnError += WebSocket_OnError;
             webSocket.OnClose += WebSocket_OnClose;
             webSocket.OnMessage += WebSocket_OnMessage;
-
-            await webSocket.Connect();
         }
 
         private void Update()
         {
             if (webSocket != null)
                 webSocket.DispatchMessageQueue();
+
+            if (webSocket.State != WebSocketState.Open && webSocket.State != WebSocketState.Connecting)
+                ConnectToWebServer();
         }
 
         private void WebSocket_OnMessage(byte[] data)
@@ -44,9 +48,18 @@ namespace SpiritLevel.Input
             {
                 ServerMessage<InputData[]> serverMsg = Newtonsoft.Json.JsonConvert.DeserializeObject<ServerMessage<InputData[]>>(result);
 
-                for (int i = 0; i < serverMsg.data.Length; i++)
+                // Processing all player inputs.
+                for (int i = 0; i < players.Count; i++)
                 {
-                    Debug.Log($"[InputManager] Alpha: {serverMsg.data[i].alpha} | Beta: {serverMsg.data[i].beta} | Gamma: {serverMsg.data[i].gamma}");
+                    for (int j = 0; j < serverMsg.data.Length; j++)
+                    {
+                        if (!players[i].UUID.Equals(serverMsg.data[j].uuid))
+                            continue;
+
+                        players[i].Input.Alpha = serverMsg.data[j].alpha;
+                        players[i].Input.Beta = serverMsg.data[j].beta;
+                        players[i].Input.Gamma = serverMsg.data[j].gamma;
+                    }
                 }
             }
             else if (sMessage.type == ServerMessageType.PLAYER_JOINED || sMessage.type == ServerMessageType.PLAYER_LEFT)
@@ -56,9 +69,9 @@ namespace SpiritLevel.Input
                 Debug.Log($"[InputManager] Player Status Update: {playerStatusUpdateData.type} | UUID: {playerStatusUpdateData.data.uuid}");
 
                 if (sMessage.type == ServerMessageType.PLAYER_JOINED)
-                    inputs.Add(new PlayerInput() { UUID = playerStatusUpdateData.data.uuid });
+                    players.Add(new Player() { UUID = playerStatusUpdateData.data.uuid });
                 else if (sMessage.type == ServerMessageType.PLAYER_LEFT && PlayerExists(playerStatusUpdateData.data.uuid, out int inputIndex))
-                    inputs.RemoveAt(inputIndex);
+                    players.RemoveAt(inputIndex);
             }
         }
 
@@ -66,9 +79,9 @@ namespace SpiritLevel.Input
         {
             inputIndex = -1;
 
-            for (int i = 0; i < inputs.Count; i++)
+            for (int i = 0; i < players.Count; i++)
             {
-                if (inputs[i].UUID.Equals(uuid))
+                if (players[i].UUID.Equals(uuid))
                 {
                     inputIndex = i;
                     return true;
@@ -80,17 +93,35 @@ namespace SpiritLevel.Input
 
         private void WebSocket_OnClose(WebSocketCloseCode closeCode)
         {
-            Debug.Log("Websocket Closed. Code: " + closeCode);
+            Debug.Log("[InputManager] Websocket Closed. Code: " + closeCode);
         }
 
         private void WebSocket_OnOpen()
         {
-            Debug.Log("Websocket Open.");
+            Debug.Log("[InputManager] Websocket Open.");
         }
 
         private void WebSocket_OnError(string errorMsg)
         {
-            Debug.Log("Websocket Error: " + errorMsg);
+            Debug.Log("[InputManager] Websocket Error: " + errorMsg);
+        }
+
+        private void ConnectToWebServer()
+        {
+            if (!tryingToConnect)
+            {
+                tryingToConnect = true;
+                Task.Run(ConnectToWebSocket);
+            }
+        }
+
+        private async void ConnectToWebSocket()
+        {
+            Debug.Log("[InputManager] Trying to connect...");
+            await webSocket.Connect();
+            Debug.Log("[InputManager] Done trying to connect.");
+
+            tryingToConnect = false;
         }
 
         private async void OnApplicationQuit()

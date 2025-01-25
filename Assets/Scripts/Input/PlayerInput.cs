@@ -1,7 +1,12 @@
 namespace SpiritLevel.Input
 {
-    public struct PlayerInput
+    using System;
+
+    [Serializable]
+    public class PlayerInput
     {
-        public string UUID;
+        public float Alpha;
+        public float Beta;
+        public float Gamma;
     }
 }
