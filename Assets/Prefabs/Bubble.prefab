@@ -55,7 +55,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 9dfc825aed78fcd4ba02077103263b40, type: 2}
+  - {fileID: 2100000, guid: eb47e068b3cb72a4f867d5e695f4b04f, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -175,7 +175,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 9dfc825aed78fcd4ba02077103263b40, type: 2}
+  - {fileID: 2100000, guid: eb47e068b3cb72a4f867d5e695f4b04f, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -279,11 +279,16 @@ MonoBehaviour:
     ID: 0
     UUID: 
     Input:
+      previousAlphaValue: 0
+      previousBetaValue: 0
+      previousGammaValue: 0
       Alpha: 0
       Beta: 0
       Gamma: 0
       Accelerometer: {x: 0, y: 0, z: 0}
       Gyroscope: {x: 0, y: 0, z: 0}
+    Bubble: {fileID: 0}
+    IsReady: 0
   rigidbody: {fileID: 4053661397993313834}
   upwardsVelocity: 5
   VisualsRoot: {fileID: 5714136844063908035}
