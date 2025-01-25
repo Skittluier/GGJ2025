@@ -11,6 +11,16 @@ public class Menu : MonoBehaviour
     [SerializeField]
     private int gameplayLevelIndex;
 
+    [SerializeField]
+    private GameObject JoinGamePanel;
+    [SerializeField]
+    private GameObject MainMenuPanel;
+
+    public void EnableJoinScreen()
+    {
+        MainMenuPanel.SetActive(false);
+        JoinGamePanel.SetActive(true);
+    }
 
     public void GoToGameplayScene()
     {

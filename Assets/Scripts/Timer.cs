@@ -1,14 +1,5 @@
-using System.Collections;
-using System.Runtime.CompilerServices;
-/// <summary>
-/// Timer system made by Geoffrey Hendrikx.
-/// </summary>
 namespace UnityEngine.Timers
 {
-    /// <summary>
-    /// This class should only be created by the class TimerManager.
-    /// Created by Geoffrey Hendrikx
-    /// </summary>
     public class Timer
     {
         public delegate void SwapBoolean(ref bool toggle);
@@ -31,7 +22,6 @@ namespace UnityEngine.Timers
                 settedTime = value;
             }
         }
-        private bool toggle;
 
         private bool? toggleTimer;
         private bool stopTimer;
