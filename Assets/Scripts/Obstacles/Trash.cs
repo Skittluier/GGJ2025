@@ -2,7 +2,7 @@
 using UnityEngine.Timers;
 using UnityEngine.UI;
 using SpiritLevel.Networking;
-using SpiritLevel.Input;
+using SpiritLevel.Player;
 
 public class Trash : Obstacle
 {

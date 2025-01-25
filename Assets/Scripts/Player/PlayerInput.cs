@@ -1,4 +1,4 @@
-namespace SpiritLevel.Input
+namespace SpiritLevel.Player
 {
     using System;
 

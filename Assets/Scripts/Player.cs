@@ -1,6 +1,6 @@
 namespace SpiritLevel
 {
-    using SpiritLevel.Input;
+    using SpiritLevel.Player;
     using System;
 
     [Serializable]
