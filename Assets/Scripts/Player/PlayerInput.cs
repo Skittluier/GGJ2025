@@ -6,7 +6,8 @@ namespace SpiritLevel.Player
     [Serializable]
     public class PlayerInput
     {
-        private const float MINIMUM_SHAKE_MAGNITUDE = 25.0f;
+        internal const float MINIMUM_SHAKE_MAGNITUDE = 25.0f;
+        internal const float MAXIMUM_SHAKE_MAGNITUDE = 500.0f;
 
         [SerializeField]
         private float previousAlphaValue;
