@@ -9,7 +9,7 @@ namespace SpiritLevel.Player
 
     public class PlayerManager : Singleton<PlayerManager>
     {
-        
+
         private WebSocket webSocket;
 
         [SerializeField, Tooltip("The websocket URL for the controls.")]
@@ -96,6 +96,19 @@ namespace SpiritLevel.Player
                     OnPlayerLeft?.Invoke(playerStatusUpdateData.data.uuid);
                 }
             }
+            else if (sMessage.type == ServerMessageType.PLAYER_READY)
+            {
+                PlayerStatusUpdateReadyData serverMsg = Newtonsoft.Json.JsonConvert.DeserializeObject<PlayerStatusUpdateReadyData>(result);
+                
+                Debug.Log("SERVER MESSAGE PLAYER READY CHANGED" + serverMsg.uuid);
+
+                for (int i = 0; i < PlayerManager.Instance.Players.Count; i++)
+                {
+                    //Check which player sent the message
+                    if (PlayerManager.Instance.Players[i].UUID == serverMsg.uuid)
+                        PlayerManager.Instance.Players[i].IsReady = serverMsg.ready;
+                }
+            }
         }
 
         private bool PlayerExists(string uuid, out int inputIndex)
@@ -114,8 +127,8 @@ namespace SpiritLevel.Player
             return false;
         }
 
-        
-        public void SendData(string data )
+
+        public void SendData(string data)
         {
             webSocket.SendText(data);
         }
