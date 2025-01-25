@@ -2,7 +2,7 @@ namespace SpiritLevel.Networking
 {
     public enum ServerMessageType
     {
-        PLAYER_JOINED, PLAYER_LEFT, PLAYER_INPUT
+        PLAYER_JOINED, PLAYER_LEFT, PLAYER_INPUT, PLAYER_READY
     }
 
     public enum UnityMessageType

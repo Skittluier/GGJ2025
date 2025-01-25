@@ -22,6 +22,16 @@ public class Bubble : MonoBehaviour
     private ExpressionSet[] expressionSprites;
 
     /// <summary>
+    /// The current expression of the bubble
+    /// </summary>
+    private Expression currentExpression = Expression.Normal;
+
+    /// <summary>
+    /// Amount of time before returning to the default expression
+    /// </summary>
+    private float expressionTimer = 0f;
+
+    /// <summary>
     /// Called every physics update
     /// </summary>
     private void FixedUpdate()
@@ -40,6 +50,11 @@ public class Bubble : MonoBehaviour
 
         //Update bubble position in the world based on its player index
         Shader.SetGlobalVector(string.Format("_BubblePosition{0}", player.ID), transform.position);
+
+        if (expressionTimer > 0)
+            expressionTimer = Mathf.Clamp(expressionTimer - Time.deltaTime, 0, 100);
+        else if (expressionTimer <= 0 && currentExpression != Expression.Normal)
+            SetExpression(Expression.Normal, 0f);
     }
 
     /// <summary>
@@ -73,7 +88,13 @@ public class Bubble : MonoBehaviour
 
         //If an expression has been found, apply its
         if (expressionSet.HasValue)
+        {
+            //Set expression
             expressionRenderer.sprite = expressionSet.Value.ExpressionSprite;
+
+            //Set expression timer
+            expressionTimer = time;
+        }
     }
 
     /// <summary>
@@ -95,11 +116,10 @@ public class Bubble : MonoBehaviour
     public enum Expression
     {
         Normal,
-        Sad,
+        Crying,
+        Floating,
+        Impact,
         Blink,
-        FuckedUp,
-        Spooked,
-        Bonk,
-        Anguish
+        Spinning,
     }
 }

@@ -58,9 +58,6 @@ public class Game : MonoBehaviour
         //Set countdown state
         CurrentGameState = GameState.Countdown;
 
-        //Send signal to start the countdown for the game
-        gameUIAnimator.SetTrigger("Start Countdown");
-
         //Set countdown timestamp
         startingTimestamp = countdownTime;
     }

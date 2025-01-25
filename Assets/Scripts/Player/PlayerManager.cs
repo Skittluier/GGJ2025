@@ -9,6 +9,7 @@ namespace SpiritLevel.Player
 
     public class PlayerManager : Singleton<PlayerManager>
     {
+
         private WebSocket webSocket;
 
         [SerializeField, Tooltip("The websocket URL for the controls.")]
@@ -28,6 +29,8 @@ namespace SpiritLevel.Player
 
         private void Start()
         {
+            DontDestroyOnLoad(this.gameObject);
+
             webSocket = new WebSocket(webSocketURL);
 
             webSocket.OnOpen += WebSocket_OnOpen;
@@ -45,6 +48,10 @@ namespace SpiritLevel.Player
                 if (webSocket.State != WebSocketState.Open && webSocket.State != WebSocketState.Connecting)
                     ConnectToWebServer();
             }
+
+            for (int i = 0; i < Players.Count; i++)
+                if (Players[i].Input.IsShaking(out float shakeMag))
+                    Debug.Log($"Player[{i}] Shake Mag: {shakeMag}");
         }
 
         private void WebSocket_OnMessage(byte[] data)
@@ -64,9 +71,7 @@ namespace SpiritLevel.Player
                         if (!Players[i].UUID.Equals(serverMsg.data[j].uuid))
                             continue;
 
-                        Players[i].Input.Alpha = serverMsg.data[j].alpha;
-                        Players[i].Input.Beta = serverMsg.data[j].beta;
-                        Players[i].Input.Gamma = serverMsg.data[j].gamma;
+                        Players[i].Input.UpdateOrientationValues(serverMsg.data[j].alpha, serverMsg.data[j].beta, serverMsg.data[j].gamma);
                         Players[i].Input.Accelerometer = new Vector3(serverMsg.data[j].accX, serverMsg.data[j].accY, serverMsg.data[j].accZ);
                         Players[i].Input.Gyroscope = new Vector3(serverMsg.data[j].gyroX, serverMsg.data[j].gyroY, serverMsg.data[j].gyroZ);
                     }
@@ -91,6 +96,19 @@ namespace SpiritLevel.Player
                     OnPlayerLeft?.Invoke(playerStatusUpdateData.data.uuid);
                 }
             }
+            else if (sMessage.type == ServerMessageType.PLAYER_READY)
+            {
+                PlayerStatusUpdateReadyData serverMsg = Newtonsoft.Json.JsonConvert.DeserializeObject<PlayerStatusUpdateReadyData>(result);
+                
+                Debug.Log("SERVER MESSAGE PLAYER READY CHANGED" + serverMsg.uuid);
+
+                for (int i = 0; i < PlayerManager.Instance.Players.Count; i++)
+                {
+                    //Check which player sent the message
+                    if (PlayerManager.Instance.Players[i].UUID == serverMsg.uuid)
+                        PlayerManager.Instance.Players[i].IsReady = serverMsg.ready;
+                }
+            }
         }
 
         private bool PlayerExists(string uuid, out int inputIndex)
@@ -109,7 +127,8 @@ namespace SpiritLevel.Player
             return false;
         }
 
-        public void SendData(string data )
+
+        public void SendData(string data)
         {
             webSocket.SendText(data);
         }

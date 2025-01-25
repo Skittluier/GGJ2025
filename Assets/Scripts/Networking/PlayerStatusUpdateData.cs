@@ -5,4 +5,11 @@ namespace SpiritLevel.Networking
         public int id;
         public string uuid;
     }
+
+    public class PlayerStatusUpdateReadyData
+    {
+        public int id;
+        public string uuid;
+        public bool ready;
+    }
 }

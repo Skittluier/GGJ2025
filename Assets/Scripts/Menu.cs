@@ -1,3 +1,4 @@
+using SpiritLevel.Player;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -20,6 +21,18 @@ public class Menu : MonoBehaviour
     {
         MainMenuPanel.SetActive(false);
         JoinGamePanel.SetActive(true);
+    }
+
+
+    public void Update()
+    {
+        bool allPlayersReady = false;
+
+        //Loop over all players and check if ready
+        for (int i = 0; i < PlayerManager.Instance.Players.Count; i++)
+        {
+            
+        }
     }
 
     public void GoToGameplayScene()
