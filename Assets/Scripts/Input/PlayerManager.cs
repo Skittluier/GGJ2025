@@ -7,7 +7,7 @@ namespace SpiritLevel.Input
     using Unity.Collections;
     using UnityEngine;
 
-    public class InputManager : Singleton<InputManager>
+    public class PlayerManager : Singleton<PlayerManager>
     {
         private WebSocket webSocket;
 
@@ -16,6 +16,12 @@ namespace SpiritLevel.Input
 
         [field: SerializeField, ReadOnly]
         internal List<Player> Players { get; private set; } = new List<Player>();
+
+        internal delegate void OnPlayerJoinedMethod(Player player);
+        internal OnPlayerJoinedMethod OnPlayerJoined;
+
+        internal delegate void OnPlayerLeftMethod(string playerUUID);
+        internal OnPlayerLeftMethod OnPlayerLeft;
 
         private bool tryingToConnect = false;
 
@@ -69,9 +75,17 @@ namespace SpiritLevel.Input
                 Debug.Log($"[InputManager] Player Status Update: {playerStatusUpdateData.type} | UUID: {playerStatusUpdateData.data.uuid}");
 
                 if (sMessage.type == ServerMessageType.PLAYER_JOINED)
-                    Players.Add(new Player() { UUID = playerStatusUpdateData.data.uuid });
+                {
+                    Player player = new Player() { UUID = playerStatusUpdateData.data.uuid };
+                    Players.Add(player);
+
+                    OnPlayerJoined?.Invoke(player);
+                }
                 else if (sMessage.type == ServerMessageType.PLAYER_LEFT && PlayerExists(playerStatusUpdateData.data.uuid, out int inputIndex))
+                {
                     Players.RemoveAt(inputIndex);
+                    OnPlayerLeft?.Invoke(playerStatusUpdateData.data.uuid);
+                }
             }
         }
 
