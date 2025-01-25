@@ -1102,14 +1102,46 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1617201822624239643, guid: 5297366b48054824db4d65ddeea1e63c, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1617201822624239643, guid: 5297366b48054824db4d65ddeea1e63c, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1970950231834932577, guid: 5297366b48054824db4d65ddeea1e63c, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1970950231834932577, guid: 5297366b48054824db4d65ddeea1e63c, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 2811458943969271637, guid: 5297366b48054824db4d65ddeea1e63c, type: 3}
       propertyPath: m_Name
       value: WaterPas
+      objectReference: {fileID: 0}
+    - target: {fileID: 3529976314442471116, guid: 5297366b48054824db4d65ddeea1e63c, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3529976314442471116, guid: 5297366b48054824db4d65ddeea1e63c, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3910350443725611169, guid: 5297366b48054824db4d65ddeea1e63c, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
       objectReference: {fileID: 2100000, guid: f7df9a0cf76856d4db08d81dc2a9aa3d, type: 2}
+    - target: {fileID: 4019234090089987406, guid: 5297366b48054824db4d65ddeea1e63c, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4019234090089987406, guid: 5297366b48054824db4d65ddeea1e63c, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4304758722781284298, guid: 5297366b48054824db4d65ddeea1e63c, type: 3}
       propertyPath: 'm_Materials.Array.data[1]'
       value: 
