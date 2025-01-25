@@ -39,10 +39,12 @@ namespace SpiritLevel.Player
         private void Update()
         {
             if (webSocket != null)
+            {
                 webSocket.DispatchMessageQueue();
 
-            if (webSocket.State != WebSocketState.Open && webSocket.State != WebSocketState.Connecting)
-                ConnectToWebServer();
+                if (webSocket.State != WebSocketState.Open && webSocket.State != WebSocketState.Connecting)
+                    ConnectToWebServer();
+            }
         }
 
         private void WebSocket_OnMessage(byte[] data)
@@ -106,8 +108,8 @@ namespace SpiritLevel.Player
 
             return false;
         }
-        
-        public void SendHapticFeedback<T>(string uuid, byte[] data )
+
+        public void SendHapticFeedback<T>(string uuid, byte[] data)
         {
 
         }
@@ -149,7 +151,8 @@ namespace SpiritLevel.Player
 
         private async void OnApplicationQuit()
         {
-            await webSocket.Close();
+            if (webSocket != null)
+                await webSocket.Close();
         }
     }
 }
