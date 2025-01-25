@@ -17,7 +17,7 @@ public class Waterpas : MonoBehaviour
     private void Update()
     {
         //Stop processing input if the game hasn't started yet
-        if (Game.Instance?.GameStarted != true)
+        if (Game.Instance?.CurrentGameState != Game.GameState.Gameplay)
             return;
 
         float horizontalInput = Input.GetAxis("Horizontal");

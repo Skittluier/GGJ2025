@@ -7,7 +7,7 @@ namespace SpiritLevel.Input
     using Unity.Collections;
     using UnityEngine;
 
-    public class InputManager : MonoBehaviour
+    public class InputManager : Singleton<InputManager>
     {
         private WebSocket webSocket;
 
@@ -89,6 +89,11 @@ namespace SpiritLevel.Input
             }
 
             return false;
+        }
+        
+        public void SendHapticFeedback<T>(string uuid, byte[] data )
+        {
+
         }
 
         private void WebSocket_OnClose(WebSocketCloseCode closeCode)
