@@ -317,6 +317,10 @@ PrefabInstance:
       propertyPath: mainCameraAnimator
       value: 
       objectReference: {fileID: 443801061371848759}
+    - target: {fileID: 4848552851056387715, guid: 27e5dff7528ea5147b3302be04998521, type: 3}
+      propertyPath: bubbleVictoryAudioResource
+      value: 
+      objectReference: {fileID: 8300000, guid: 73affd18dfd08d946a09e00c3ed43256, type: 3}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -520,7 +524,7 @@ PrefabInstance:
     - target: {fileID: 8580026547236198175, guid: 5c1f778bcbc24e34a8f79d8011ccd4d2, type: 3}
       propertyPath: introSequenceAudioClip
       value: 
-      objectReference: {fileID: 8300000, guid: 3a4d881be9ca3e347b697438d0bd798c, type: 3}
+      objectReference: {fileID: 8300000, guid: 7c4a9bc9c99f9124ba67db8dfa0d56df, type: 3}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
