@@ -129,6 +129,7 @@ GameObject:
   m_Component:
   - component: {fileID: 229094622}
   - component: {fileID: 229094623}
+  - component: {fileID: 229094624}
   m_Layer: 0
   m_Name: Game
   m_TagString: Untagged
@@ -167,6 +168,19 @@ MonoBehaviour:
   roundTime: 60
   countdownTime: 3
   countdownText: {fileID: 1461675034}
+--- !u!114 &229094624
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 229094620}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 573c6eb5e7e6b524cace8253f76b0a6f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  webSocketURL: wss://rational-openly-colt.ngrok-free.app/api/server
 --- !u!1 &443410287
 GameObject:
   m_ObjectHideFlags: 0
