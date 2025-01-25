@@ -27,7 +27,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 8.652959, y: 8.652959, z: 8.652959}
+  m_LocalScale: {x: 0.16600329, y: 0.16600329, z: 0.16600329}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 5714136844063908035}
@@ -76,7 +76,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 10911, guid: 0000000000000000f000000000000000, type: 0}
+  m_Sprite: {fileID: 21300000, guid: ee31638bea7c270498c3123f655d5523, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -146,8 +146,8 @@ Transform:
   m_GameObject: {fileID: 6138656182020184790}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.00000010723, y: 0, z: 0}
-  m_LocalScale: {x: 0.35182, y: 0.35182, z: 0.35182}
+  m_LocalPosition: {x: -0.00000010723, y: 0.086, z: 0}
+  m_LocalScale: {x: 0.20096052, y: 0.20096052, z: 0.20096052}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 5714136844063908035}
@@ -216,8 +216,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1004961656624146171}
-  - component: {fileID: 7626731753028445884}
-  - component: {fileID: 1667616918748783457}
   - component: {fileID: 6499123004417564172}
   - component: {fileID: 9111316273228769700}
   - component: {fileID: 4053661397993313834}
@@ -244,59 +242,6 @@ Transform:
   - {fileID: 5714136844063908035}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!33 &7626731753028445884
-MeshFilter:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7285400275432562367}
-  m_Mesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
---- !u!23 &1667616918748783457
-MeshRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7285400275432562367}
-  m_Enabled: 0
-  m_CastShadows: 1
-  m_ReceiveShadows: 1
-  m_DynamicOccludee: 1
-  m_StaticShadowCaster: 0
-  m_MotionVectors: 1
-  m_LightProbeUsage: 1
-  m_ReflectionProbeUsage: 1
-  m_RayTracingMode: 2
-  m_RayTraceProcedural: 0
-  m_RayTracingAccelStructBuildFlagsOverride: 0
-  m_RayTracingAccelStructBuildFlags: 1
-  m_SmallMeshCulling: 1
-  m_RenderingLayerMask: 1
-  m_RendererPriority: 0
-  m_Materials:
-  - {fileID: 2100000, guid: eb47e068b3cb72a4f867d5e695f4b04f, type: 2}
-  m_StaticBatchInfo:
-    firstSubMesh: 0
-    subMeshCount: 0
-  m_StaticBatchRoot: {fileID: 0}
-  m_ProbeAnchor: {fileID: 0}
-  m_LightProbeVolumeOverride: {fileID: 0}
-  m_ScaleInLightmap: 1
-  m_ReceiveGI: 1
-  m_PreserveUVs: 0
-  m_IgnoreNormalsForChartDetection: 0
-  m_ImportantGI: 0
-  m_StitchLightmapSeams: 1
-  m_SelectedEditorRenderState: 3
-  m_MinimumChartSize: 4
-  m_AutoUVMaxDistance: 0.5
-  m_AutoUVMaxAngle: 89
-  m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
-  m_SortingOrder: 0
-  m_AdditionalVertexStreams: {fileID: 0}
 --- !u!135 &6499123004417564172
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -330,22 +275,32 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e724f008bfc24064fb8eacca880b9ebe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  PlayerIndex: 0
+  player:
+    ID: 0
+    UUID: 
+    Input:
+      Alpha: 0
+      Beta: 0
+      Gamma: 0
+      Accelerometer: {x: 0, y: 0, z: 0}
+      Gyroscope: {x: 0, y: 0, z: 0}
   rigidbody: {fileID: 4053661397993313834}
   upwardsVelocity: 5
   VisualsRoot: {fileID: 5714136844063908035}
   rootRenderer: {fileID: 7176198511789766638}
-  expressionRenderer: {fileID: 0}
+  expressionRenderer: {fileID: 6853908973441097722}
   expressionSprites:
   - Expression: 0
     ExpressionSprite: {fileID: 21300000, guid: 72709d8e07b33b44b82d4c52f8e92b84, type: 3}
-  - Expression: 2
-    ExpressionSprite: {fileID: 21300000, guid: 089482b39f2bcc9428fc4c1b6fb6af19, type: 3}
   - Expression: 1
     ExpressionSprite: {fileID: 21300000, guid: d89f09abf4b07ab42b38d2d6538e0eca, type: 3}
-  - Expression: 3
+  - Expression: 2
     ExpressionSprite: {fileID: 21300000, guid: 2057bc336f9b7ce4388bf5551a80a4e9, type: 3}
-  - Expression: 6
+  - Expression: 3
+    ExpressionSprite: {fileID: 21300000, guid: 028dc1e75fbe1a742bd0d0e384920c67, type: 3}
+  - Expression: 4
+    ExpressionSprite: {fileID: 21300000, guid: 089482b39f2bcc9428fc4c1b6fb6af19, type: 3}
+  - Expression: 5
     ExpressionSprite: {fileID: 21300000, guid: 7c5bf5a86e352644893c226962d67ebb, type: 3}
 --- !u!54 &4053661397993313834
 Rigidbody:

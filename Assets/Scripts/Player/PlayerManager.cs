@@ -9,6 +9,7 @@ namespace SpiritLevel.Player
 
     public class PlayerManager : Singleton<PlayerManager>
     {
+        
         private WebSocket webSocket;
 
         [SerializeField, Tooltip("The websocket URL for the controls.")]
@@ -28,6 +29,8 @@ namespace SpiritLevel.Player
 
         private void Start()
         {
+            DontDestroyOnLoad(this.gameObject);
+
             webSocket = new WebSocket(webSocketURL);
 
             webSocket.OnOpen += WebSocket_OnOpen;
@@ -111,9 +114,15 @@ namespace SpiritLevel.Player
             return false;
         }
 
-        public void SendHapticFeedback<T>(string uuid, byte[] data)
+        
+        public void SendData(string data )
         {
+            webSocket.SendText(data);
+        }
 
+        public void SendUnityMessage(string data)
+        {
+            webSocket.SendText(data);
         }
 
         private void WebSocket_OnClose(WebSocketCloseCode closeCode)
