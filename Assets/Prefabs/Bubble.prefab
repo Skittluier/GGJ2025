@@ -312,7 +312,7 @@ MonoBehaviour:
   twerkGameObject: {fileID: 8803813858570063057}
   voiceAudioSource: {fileID: 3662855518767105170}
   environmentAudioSource: {fileID: 6692478530676668105}
-  minImpactMagnitude: 0.1
+  minImpactMagnitude: 0
   impactVoiceAudioResource: {fileID: 6418180475301049370, guid: 16cf5ace5f657d04595e2eac9a2ce6fa, type: 2}
   impactAudioResource: {fileID: 6418180475301049370, guid: 53dd95cadc4e3d149a747e0c5e235531, type: 2}
 --- !u!54 &4053661397993313834
