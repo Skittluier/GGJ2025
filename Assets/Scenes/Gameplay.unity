@@ -159,7 +159,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 229094620}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 15c44aaea45289745bff5ab0e4631e09, type: 3}
   m_Name: 
@@ -953,6 +953,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 903366276444891373, guid: d96ba45fd366c9846b9c9e64521ce684, type: 3}
+      propertyPath: webSocketURL
+      value: wss://rational-openly-colt.ngrok-free.app/api/server
+      objectReference: {fileID: 0}
     - target: {fileID: 2811458943969271637, guid: d96ba45fd366c9846b9c9e64521ce684, type: 3}
       propertyPath: m_Name
       value: WaterPas
