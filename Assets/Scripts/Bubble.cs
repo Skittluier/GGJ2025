@@ -1,9 +1,10 @@
+using SpiritLevel;
 using UnityEngine;
 
 public class Bubble : MonoBehaviour
 {
     [Tooltip("The assigned Player Index for this bubble")]
-    public int PlayerIndex = 0;
+    public PlayerIdentity player;
 
     [SerializeField, Tooltip("The rigidbody of the bubble")]
     private new Rigidbody rigidbody;
@@ -38,7 +39,7 @@ public class Bubble : MonoBehaviour
         UpdateBillboarding();
 
         //Update bubble position in the world based on its player index
-        Shader.SetGlobalVector(string.Format("_BubblePosition{0}", PlayerIndex), transform.position);
+        Shader.SetGlobalVector(string.Format("_BubblePosition{0}", player.ID), transform.position);
     }
 
     /// <summary>

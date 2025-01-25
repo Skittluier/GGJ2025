@@ -65,6 +65,8 @@ namespace SpiritLevel.Player
                         Players[i].Input.Alpha = serverMsg.data[j].alpha;
                         Players[i].Input.Beta = serverMsg.data[j].beta;
                         Players[i].Input.Gamma = serverMsg.data[j].gamma;
+                        Players[i].Input.Accelerometer = new Vector3(serverMsg.data[j].accX, serverMsg.data[j].accY, serverMsg.data[j].accZ);
+                        Players[i].Input.Gyroscope = new Vector3(serverMsg.data[j].gyroX, serverMsg.data[j].gyroY, serverMsg.data[j].gyroZ);
                     }
                 }
             }
@@ -72,11 +74,11 @@ namespace SpiritLevel.Player
             {
                 ServerMessage<PlayerStatusUpdateData> playerStatusUpdateData = Newtonsoft.Json.JsonConvert.DeserializeObject<ServerMessage<PlayerStatusUpdateData>>(result);
 
-                Debug.Log($"[InputManager] Player Status Update: {playerStatusUpdateData.type} | UUID: {playerStatusUpdateData.data.uuid}");
+                Debug.Log($"[InputManager] Player Status Update: {playerStatusUpdateData.type} | ID: {playerStatusUpdateData.data.id} | UUID: {playerStatusUpdateData.data.uuid}");
 
                 if (sMessage.type == ServerMessageType.PLAYER_JOINED)
                 {
-                    PlayerIdentity player = new PlayerIdentity() { UUID = playerStatusUpdateData.data.uuid };
+                    PlayerIdentity player = new PlayerIdentity() { UUID = playerStatusUpdateData.data.uuid, ID = playerStatusUpdateData.data.id };
                     Players.Add(player);
 
                     OnPlayerJoined?.Invoke(player);
@@ -113,6 +115,7 @@ namespace SpiritLevel.Player
         private void WebSocket_OnClose(WebSocketCloseCode closeCode)
         {
             Debug.Log("[InputManager] Websocket Closed. Code: " + closeCode);
+            Players.Clear();
         }
 
         private void WebSocket_OnOpen()
@@ -138,6 +141,7 @@ namespace SpiritLevel.Player
         {
             Debug.Log("[InputManager] Trying to connect...");
             await webSocket.Connect();
+            await Task.Delay(1000);
             Debug.Log("[InputManager] Done trying to connect.");
 
             tryingToConnect = false;
