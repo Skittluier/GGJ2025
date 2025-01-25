@@ -6,12 +6,12 @@ using UnityEngine;
 public class BubbleManager : MonoBehaviour
 {
     public GameObject bubblePrefab;
-    public List<PlayerIdentity> bubbleList;
+    public List<Bubble> bubbleList;
     public Transform[] startPosition;
 
     public void Awake()
     {
-        bubbleList = new List<PlayerIdentity>();
+        bubbleList = new List<Bubble>();
     }
 
     private void OnEnable()
@@ -38,7 +38,7 @@ public class BubbleManager : MonoBehaviour
         bubble.player.UUID = playerID.UUID;
         bubble.player.ID = playerID.ID;
         player.transform.position = startPosition[bubbleList.Count].position;
-        bubbleList.Add(playerID);
+        bubbleList.Add(bubble);
     }
 
     private void PlayerLeft(string playerUUID)
