@@ -1,10 +1,10 @@
+using SpiritLevel;
 using UnityEngine;
-using UnityEngine.Rendering.LookDev;
 
 public class Bubble : MonoBehaviour
 {
     [Tooltip("The assigned Player Index for this bubble")]
-    public int PlayerIndex = 0;
+    public PlayerIdentity player;
 
     [SerializeField, Tooltip("The rigidbody of the bubble")]
     private new Rigidbody rigidbody;
@@ -16,14 +16,23 @@ public class Bubble : MonoBehaviour
     private Transform VisualsRoot;
 
     [SerializeField, Tooltip("References to the Renderers on the bubble")]
-    private SpriteRenderer rootRenderer, leftEyeRenderer, rightEyeRenderer, mouthRenderer;
+    private SpriteRenderer rootRenderer, expressionRenderer;
 
     [SerializeField, Tooltip("All the possible face configurations for the bubble")]
     private ExpressionSet[] expressionSprites;
 
+    /// <summary>
+    /// The current expression of the bubble
+    /// </summary>
+    private Expression currentExpression = Expression.Normal;
 
     /// <summary>
-    /// 
+    /// Amount of time before returning to the default expression
+    /// </summary>
+    private float expressionTimer = 0f;
+
+    /// <summary>
+    /// Called every physics update
     /// </summary>
     private void FixedUpdate()
     {
@@ -40,7 +49,12 @@ public class Bubble : MonoBehaviour
         UpdateBillboarding();
 
         //Update bubble position in the world based on its player index
-        Shader.SetGlobalVector(string.Format("_BubblePosition{0}", PlayerIndex), transform.position);
+        Shader.SetGlobalVector(string.Format("_BubblePosition{0}", player.ID), transform.position);
+
+        if (expressionTimer > 0)
+            expressionTimer = Mathf.Clamp(expressionTimer - Time.deltaTime, 0, 100);
+        else if (expressionTimer <= 0 && currentExpression != Expression.Normal)
+            SetExpression(Expression.Normal, 0f);
     }
 
     /// <summary>
@@ -75,36 +89,37 @@ public class Bubble : MonoBehaviour
         //If an expression has been found, apply its
         if (expressionSet.HasValue)
         {
-            leftEyeRenderer.sprite = expressionSet.Value.LeftEyeSprite;
-            rightEyeRenderer.sprite = expressionSet.Value.RightEyeSprite;
-            mouthRenderer.sprite = expressionSet.Value.MouthSprite;
+            //Set expression
+            expressionRenderer.sprite = expressionSet.Value.ExpressionSprite;
+
+            //Set expression timer
+            expressionTimer = time;
         }
     }
 
+    /// <summary>
+    /// Struct for holding 
+    /// </summary>
+    [System.Serializable]
     public struct ExpressionSet
     {
         [Tooltip("The Expression this belongs to")]
         public Expression Expression;
 
-        [Tooltip("Sprite for the mouth")]
-        public Sprite MouthSprite;
-
-        [Tooltip("Sprite for the left eye")]
-        public Sprite LeftEyeSprite;
-
-        [Tooltip("Sprite for the right eye")]
-        public Sprite RightEyeSprite;
-
+        [Tooltip("Sprite for the expression of the player")]
+        public Sprite ExpressionSprite;
     }
 
+    /// <summary>
+    /// Enum set for representing different expressions
+    /// </summary>
     public enum Expression
     {
         Normal,
-        Sad,
+        Crying,
+        Floating,
+        Impact,
         Blink,
-        FuckedUp,
-        Spooked,
-        Bonk,
-        Anguish
+        Spinning,
     }
 }

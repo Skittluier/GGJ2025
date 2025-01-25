@@ -21,9 +21,6 @@ public class Game : MonoBehaviour
     [SerializeField, Tooltip("Text that shows that the players can start the game")]
     private TextMeshProUGUI startGameText;
 
-    [SerializeField, Tooltip("Text that shows that when the players lost the game")]
-    private TextMeshProUGUI gameLostText;
-
     [SerializeField, Tooltip("Animator that controls the in-game UI")]
     private Animator gameUIAnimator;
 
@@ -51,16 +48,27 @@ public class Game : MonoBehaviour
 
         //Set intro state
         CurrentGameState = GameState.Intro;
-        startingTimestamp = countdownTime;
     }
 
+    /// <summary>
+    /// Starts the countdown sequence for starting the game
+    /// </summary>
+    public void StartCountdownSequence()
+    {
+        //Set countdown state
+        CurrentGameState = GameState.Countdown;
+
+        //Set countdown timestamp
+        startingTimestamp = countdownTime;
+    }
+    
     /// <summary>
     /// Called every frame
     /// </summary>
     private void Update()
     {
         //If the game hasn't started, perform startup logic
-        if (CurrentGameState == GameState.Intro)
+        if (CurrentGameState == GameState.Countdown)
         {
             //If a starting timestamp is present, apply game cooldown
             if (startingTimestamp > 0)
@@ -88,10 +96,14 @@ public class Game : MonoBehaviour
         else if (CurrentGameState == GameState.Gameplay)
         {
             //Lower the current game time
-            endGameTimestamp -= Mathf.Clamp(endGameTimestamp - Time.deltaTime, 0, roundTime);
+            endGameTimestamp = Mathf.Clamp(endGameTimestamp - Time.deltaTime, 0, roundTime);
 
             //Update amount of time left in the game on the in-game UI
             gameTimeText.text = string.Format("You have: {0:0.0} seconds left!",endGameTimestamp);
+
+            //If the gametime is getting below 0, the game round is over and the players have lost
+            if(endGameTimestamp <= 0)
+                LoseGame();
         }
         //Outro logic
         else if (CurrentGameState == GameState.Outro)
@@ -107,15 +119,34 @@ public class Game : MonoBehaviour
     {
         //Indicate that the game has started
         CurrentGameState = GameState.Gameplay;
+
+        //Assign the round time
+        endGameTimestamp = roundTime;
     }
 
     /// <summary>
-    /// Ends the currrent gameplay session
+    /// This function executes the winning sequence
     /// </summary>
-    private void EndGame()
+    public void WinGame()
     {
         //Indicate that the game has finished
         CurrentGameState = GameState.Outro;
+
+        //Send win signal to the Animator
+        gameUIAnimator.SetTrigger("Win Game");
+    }
+
+
+    /// <summary>
+    /// This function executes the losing sequence
+    /// </summary>
+    private void LoseGame()
+    {
+        //Indicate that the game has finished
+        CurrentGameState = GameState.Outro;
+    
+        //Send lose signal to the Animator
+        gameUIAnimator.SetTrigger("Lose Game");
     }
 
     /// <summary>
@@ -124,6 +155,7 @@ public class Game : MonoBehaviour
     public enum GameState
     {
         Intro,
+        Countdown,
         Gameplay,
         Outro,
     }

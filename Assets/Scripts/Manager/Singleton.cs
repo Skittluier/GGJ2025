@@ -16,7 +16,7 @@ public class Singleton<T> : MonoBehaviour where T : MonoBehaviour
     {
         if (Instance)
         {
-            Destroy(this);
+            Destroy(this.gameObject);
             return;
         }
         Instance = GetComponent<T>();

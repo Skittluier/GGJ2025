@@ -3,9 +3,12 @@ using UnityEngine.Timers;
 using UnityEngine.UI;
 using SpiritLevel.Networking;
 using SpiritLevel.Player;
+using System.Collections.Generic;
+using UnityEditor.VersionControl;
 
 public class Trash : Obstacle
 {
+    private Bubble bubble;
     private Rigidbody BubbleRigidbody;
     [SerializeField]
     private LayerMask mask;
@@ -20,17 +23,20 @@ public class Trash : Obstacle
     private bool canStartShaking;
     private bool startedTimer;
     public Slider progressBar;
+    public float ProgressAddingValue = 0.01f;
     private void OnTriggerEnter(Collider collision)
     {
         var hitLayerMask = 1 << collision.gameObject.layer;
         if ((hitLayerMask & mask) == 1)
         {
-            BubbleRigidbody = collision.gameObject.GetComponent<Rigidbody>();
-            if (BubbleRigidbody == null)
-                Debug.LogError("No bubble");
-            BubbleRigidbody.Sleep();
-            canStartShaking = true;
-            StartShaking();
+            if (collision.TryGetComponent<Bubble>(out Bubble bubble))
+            {
+                this.bubble = bubble;
+                BubbleRigidbody = collision.gameObject.GetComponent<Rigidbody>();
+                BubbleRigidbody.Sleep();
+                canStartShaking = true;
+                StartShaking();
+            }
         }
     }
 
@@ -52,23 +58,25 @@ public class Trash : Obstacle
         startTime = Time.time;
         progressBar.value = 0;
         progressBar.gameObject.SetActive(true);
-        UnityMessage<object> message = new UnityMessage<object>()
+        UnityMessage<Dictionary<string, float>> message = new UnityMessage<Dictionary<string, float>>()
         {
             type = UnityMessageType.VIBRATION_START,
-            data = 5000f
+            data = new Dictionary<string, float>()
+            {
+                { bubble.player.UUID, 5000f }
+            }
         };
-        object data = Newtonsoft.Json.JsonConvert.SerializeObject(message);
-
-        //InputManager.Instance.SendHapticFeedback(data);
+        string data = Newtonsoft.Json.JsonConvert.SerializeObject(message);
+        PlayerManager.Instance.SendData(data);
     }
 
-    public void Update()
+    public void LateUpdate()
     {
         if (canStartShaking)
         {
             if (StillShaking())
             {
-                progressBar.value += 0.1f;
+                progressBar.value += ProgressAddingValue;
             }
         }
     }
@@ -86,6 +94,15 @@ public class Trash : Obstacle
             progressBar.gameObject.SetActive(false);
             gameObject.SetActive(false);
             Debug.Log("Break");
+            UnityMessage<string> message = new UnityMessage<string>()
+            {
+                type = UnityMessageType.VIBRATION_STOP,
+                data = bubble.player.UUID
+            };
+
+            string data = Newtonsoft.Json.JsonConvert.SerializeObject(message);
+            PlayerManager.Instance.SendData(data);
+
         }
     }
 }

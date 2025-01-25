@@ -9,6 +9,7 @@ namespace SpiritLevel.Player
 
     public class PlayerManager : Singleton<PlayerManager>
     {
+        
         private WebSocket webSocket;
 
         [SerializeField, Tooltip("The websocket URL for the controls.")]
@@ -28,6 +29,8 @@ namespace SpiritLevel.Player
 
         private void Start()
         {
+            DontDestroyOnLoad(this.gameObject);
+
             webSocket = new WebSocket(webSocketURL);
 
             webSocket.OnOpen += WebSocket_OnOpen;
@@ -39,10 +42,16 @@ namespace SpiritLevel.Player
         private void Update()
         {
             if (webSocket != null)
+            {
                 webSocket.DispatchMessageQueue();
 
-            if (webSocket.State != WebSocketState.Open && webSocket.State != WebSocketState.Connecting)
-                ConnectToWebServer();
+                if (webSocket.State != WebSocketState.Open && webSocket.State != WebSocketState.Connecting)
+                    ConnectToWebServer();
+            }
+
+            for (int i = 0; i < Players.Count; i++)
+                if (Players[i].Input.IsShaking(out float shakeMag))
+                    Debug.Log($"Player[{i}] Shake Mag: {shakeMag}");
         }
 
         private void WebSocket_OnMessage(byte[] data)
@@ -62,9 +71,9 @@ namespace SpiritLevel.Player
                         if (!Players[i].UUID.Equals(serverMsg.data[j].uuid))
                             continue;
 
-                        Players[i].Input.Alpha = serverMsg.data[j].alpha;
-                        Players[i].Input.Beta = serverMsg.data[j].beta;
-                        Players[i].Input.Gamma = serverMsg.data[j].gamma;
+                        Players[i].Input.UpdateOrientationValues(serverMsg.data[j].alpha, serverMsg.data[j].beta, serverMsg.data[j].gamma);
+                        Players[i].Input.Accelerometer = new Vector3(serverMsg.data[j].accX, serverMsg.data[j].accY, serverMsg.data[j].accZ);
+                        Players[i].Input.Gyroscope = new Vector3(serverMsg.data[j].gyroX, serverMsg.data[j].gyroY, serverMsg.data[j].gyroZ);
                     }
                 }
             }
@@ -72,11 +81,11 @@ namespace SpiritLevel.Player
             {
                 ServerMessage<PlayerStatusUpdateData> playerStatusUpdateData = Newtonsoft.Json.JsonConvert.DeserializeObject<ServerMessage<PlayerStatusUpdateData>>(result);
 
-                Debug.Log($"[InputManager] Player Status Update: {playerStatusUpdateData.type} | UUID: {playerStatusUpdateData.data.uuid}");
+                Debug.Log($"[InputManager] Player Status Update: {playerStatusUpdateData.type} | ID: {playerStatusUpdateData.data.id} | UUID: {playerStatusUpdateData.data.uuid}");
 
                 if (sMessage.type == ServerMessageType.PLAYER_JOINED)
                 {
-                    PlayerIdentity player = new PlayerIdentity() { UUID = playerStatusUpdateData.data.uuid };
+                    PlayerIdentity player = new PlayerIdentity() { UUID = playerStatusUpdateData.data.uuid, ID = playerStatusUpdateData.data.id };
                     Players.Add(player);
 
                     OnPlayerJoined?.Invoke(player);
@@ -104,15 +113,22 @@ namespace SpiritLevel.Player
 
             return false;
         }
-        
-        public void SendHapticFeedback<T>(string uuid, byte[] data )
-        {
 
+        
+        public void SendData(string data )
+        {
+            webSocket.SendText(data);
+        }
+
+        public void SendUnityMessage(string data)
+        {
+            webSocket.SendText(data);
         }
 
         private void WebSocket_OnClose(WebSocketCloseCode closeCode)
         {
             Debug.Log("[InputManager] Websocket Closed. Code: " + closeCode);
+            Players.Clear();
         }
 
         private void WebSocket_OnOpen()
@@ -138,6 +154,7 @@ namespace SpiritLevel.Player
         {
             Debug.Log("[InputManager] Trying to connect...");
             await webSocket.Connect();
+            await Task.Delay(1000);
             Debug.Log("[InputManager] Done trying to connect.");
 
             tryingToConnect = false;
@@ -145,7 +162,8 @@ namespace SpiritLevel.Player
 
         private async void OnApplicationQuit()
         {
-            await webSocket.Close();
+            if (webSocket != null)
+                await webSocket.Close();
         }
     }
 }
