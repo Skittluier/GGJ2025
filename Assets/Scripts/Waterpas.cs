@@ -1,8 +1,10 @@
 using NativeWebSocket;
+using RUMBLE.Utilities;
 using SpiritLevel.Networking;
 using SpiritLevel.Player;
 using System.Collections;
 using UnityEngine;
+using static TMPro.SpriteAssetUtilities.TexturePacker_JsonArray;
 
 public class Waterpas : MonoBehaviour
 {
@@ -21,16 +23,49 @@ public class Waterpas : MonoBehaviour
     [SerializeField, Tooltip("Prefab of the bubble player")]
     internal Bubble bubblePrefab;
 
+    [Header("PID Settings")]
+
+    /// <summary>
+    /// Reference to the internal PID controller
+    /// </summary>
+    [SerializeField]
+    internal PIDControllerAngularVelocity angularPIDController;
+
+    /// <summary>
+    /// Determines the forcemode used for applying force
+    /// </summary>
+    [SerializeField, Tooltip("Determines the forcemode used for applying force")]
+    internal ForceMode forceMode;
+
+    /// <summary>
+    /// Multiplier used for torque
+    /// </summary>
+    [SerializeField, Tooltip("Multiplier used for torque")]
+    internal float torqueMultiplier;
+
+
     /// <summary>
     /// Input queried from update loop
     /// </summary>
     private Vector2 lastInput = Vector2.zero;
+    private Vector2 latestDeltas = Vector2.zero;
 
     /// <summary>
     /// Called on the first active frame
     /// </summary>
     private void Awake()
     {
+#if UNITY_EDITOR
+        if (enableEditorInput)
+        {
+            Bubble newBubble = Instantiate(bubblePrefab, spawnPositionPlayer1.position, spawnPositionPlayer1.rotation);
+            return;
+        }
+#endif
+
+        //Attach rigidbody
+        angularPIDController.AttachedRigidBody = rigidBody;
+
         //Loop over all players and spawn their players
         for (int i = 0; i < PlayerManager.Instance.Players.Count; i++)
         {
@@ -55,28 +90,39 @@ public class Waterpas : MonoBehaviour
     private void Update()
     {
         //Stop processing input if the game hasn't started yet
-        if (Game.Instance?.CurrentGameState != Game.GameState.Gameplay)
-            return;
+        //if (Game.Instance?.CurrentGameState != Game.GameState.Gameplay)
+        //    return;
 
         float horizontalInput = 0;
         float verticalInput = 0;
 
-        //Just pick the input of the first player
-        //if (PlayerManager.Instance.Players.Count == 1)
-        //{
-        horizontalInput = PlayerManager.Instance.Players[0].Input.Alpha;
-        verticalInput = PlayerManager.Instance.Players[0].Input.Gamma;
-        //}
-        ////If there are more then 2 players, split the input across 2 different players
-        //else if (PlayerManager.Instance.Players.Count >= 2)
-        //{
-        //    //Pick alpha value from first player
-        //    horizontalInput = PlayerManager.Instance.Players[0].Input.Alpha;
+#if UNITY_EDITOR
+        if (!enableEditorInput)
+        {
+#endif
+            //Just pick the input of the first player
+            //if (PlayerManager.Instance.Players.Count == 1)
+            //{
+            horizontalInput = PlayerManager.Instance.Players[0].Input.Alpha;
+            verticalInput = PlayerManager.Instance.Players[0].Input.Gamma;
 
-        //    //Pick gamma value from player
-        //    verticalInput = PlayerManager.Instance.Players[1].Input.Gamma;
-        //}
 
+            latestDeltas = new Vector2(
+                (PlayerManager.Instance.Players[0].Input.Gamma - PlayerManager.Instance.Players[0].Input.previousGammaValue),
+               (PlayerManager.Instance.Players[0].Input.Alpha - PlayerManager.Instance.Players[0].Input.previousAlphaValue));
+            //}
+            ////If there are more then 2 players, split the input across 2 different players
+            //else if (PlayerManager.Instance.Players.Count >= 2)
+            //{
+            //    //Pick alpha value from first player
+            //    horizontalInput = PlayerManager.Instance.Players[0].Input.Alpha;
+
+            //    //Pick gamma value from player
+            //    verticalInput = PlayerManager.Instance.Players[1].Input.Gamma;
+            //}
+#if UNITY_EDITOR
+        }
+#endif
 
 #if UNITY_EDITOR
         //Set editor keyboard data for testing
@@ -95,12 +141,8 @@ public class Waterpas : MonoBehaviour
     /// </summary>
     private void FixedUpdate()
     {
-        //Get the current rotation
-        Quaternion currentRotation = rigidBody.rotation;
-        Quaternion desiredRotation = Quaternion.Euler(lastInput.y, 0, 0);
-
-        Quaternion delta = Quaternion.Inverse(desiredRotation) * currentRotation;
-
-        rigidBody.AddTorque(delta.eulerAngles, ForceMode.Impulse);
+        //PC+Keyboard controls
+        rigidBody.AddTorque(transform.forward * lastInput.x * torqueMultiplier, ForceMode.Impulse);
+        rigidBody.AddTorque(transform.right * lastInput.y * torqueMultiplier, ForceMode.Impulse);
     }
 }
