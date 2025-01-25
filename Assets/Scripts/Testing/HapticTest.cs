@@ -1,7 +1,6 @@
 ﻿using SpiritLevel.Networking;
 using SpiritLevel.Player;
 using System.Collections.Generic;
-using Unity.Android.Gradle;
 using UnityEngine;
 
 public class HapticTest : MonoBehaviour

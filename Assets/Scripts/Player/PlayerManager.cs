@@ -48,10 +48,6 @@ namespace SpiritLevel.Player
                 if (webSocket.State != WebSocketState.Open && webSocket.State != WebSocketState.Connecting)
                     ConnectToWebServer();
             }
-
-            for (int i = 0; i < Players.Count; i++)
-                if (Players[i].Input.IsShaking(out float shakeMag))
-                    Debug.Log($"Player[{i}] Shake Mag: {shakeMag}");
         }
 
         private void WebSocket_OnMessage(byte[] data)
@@ -81,7 +77,7 @@ namespace SpiritLevel.Player
             {
                 ServerMessage<PlayerStatusUpdateData> playerStatusUpdateData = Newtonsoft.Json.JsonConvert.DeserializeObject<ServerMessage<PlayerStatusUpdateData>>(result);
 
-                Debug.Log($"[InputManager] Player Status Update: {playerStatusUpdateData.type} | ID: {playerStatusUpdateData.data.id} | UUID: {playerStatusUpdateData.data.uuid}");
+                Debug.Log($"[PlayerManager] Player Status Update: {playerStatusUpdateData.type} | ID: {playerStatusUpdateData.data.id} | UUID: {playerStatusUpdateData.data.uuid}");
 
                 if (sMessage.type == ServerMessageType.PLAYER_JOINED)
                 {
@@ -98,15 +94,15 @@ namespace SpiritLevel.Player
             }
             else if (sMessage.type == ServerMessageType.PLAYER_READY)
             {
-                PlayerStatusUpdateReadyData serverMsg = Newtonsoft.Json.JsonConvert.DeserializeObject<PlayerStatusUpdateReadyData>(result);
+                ServerMessage<PlayerStatusUpdateReadyData> serverMsg = Newtonsoft.Json.JsonConvert.DeserializeObject<ServerMessage<PlayerStatusUpdateReadyData>>(result);
                 
-                Debug.Log("SERVER MESSAGE PLAYER READY CHANGED" + serverMsg.uuid);
+                Debug.Log("[PlayerManager] Player Ready changed. UUID: " + serverMsg.data.uuid);
 
-                for (int i = 0; i < PlayerManager.Instance.Players.Count; i++)
+                for (int i = 0; i < Players.Count; i++)
                 {
                     //Check which player sent the message
-                    if (PlayerManager.Instance.Players[i].UUID == serverMsg.uuid)
-                        PlayerManager.Instance.Players[i].IsReady = serverMsg.ready;
+                    if (Players[i].UUID == serverMsg.data.uuid)
+                        Players[i].IsReady = serverMsg.data.ready;
                 }
             }
         }
@@ -140,18 +136,18 @@ namespace SpiritLevel.Player
 
         private void WebSocket_OnClose(WebSocketCloseCode closeCode)
         {
-            Debug.Log("[InputManager] Websocket Closed. Code: " + closeCode);
+            Debug.Log("[PlayerManager] Websocket Closed. Code: " + closeCode);
             Players.Clear();
         }
 
         private void WebSocket_OnOpen()
         {
-            Debug.Log("[InputManager] Websocket Open.");
+            Debug.Log("[PlayerManager] Websocket Open.");
         }
 
         private void WebSocket_OnError(string errorMsg)
         {
-            Debug.Log("[InputManager] Websocket Error: " + errorMsg);
+            Debug.Log("[PlayerManager] Websocket Error: " + errorMsg);
         }
 
         private void ConnectToWebServer()
@@ -165,10 +161,10 @@ namespace SpiritLevel.Player
 
         private async void ConnectToWebSocket()
         {
-            Debug.Log("[InputManager] Trying to connect...");
+            Debug.Log("[PlayerManager] Trying to connect...");
             await webSocket.Connect();
             await Task.Delay(1000);
-            Debug.Log("[InputManager] Done trying to connect.");
+            Debug.Log("[PlayerManager] Done trying to connect.");
 
             tryingToConnect = false;
         }
