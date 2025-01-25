@@ -95,7 +95,7 @@ namespace SpiritLevel.Player
             else if (sMessage.type == ServerMessageType.PLAYER_READY)
             {
                 ServerMessage<PlayerStatusUpdateReadyData> serverMsg = Newtonsoft.Json.JsonConvert.DeserializeObject<ServerMessage<PlayerStatusUpdateReadyData>>(result);
-                
+
                 Debug.Log("[PlayerManager] Player Ready changed. UUID: " + serverMsg.data.uuid);
 
                 for (int i = 0; i < Players.Count; i++)
@@ -104,6 +104,11 @@ namespace SpiritLevel.Player
                     if (Players[i].UUID == serverMsg.data.uuid)
                         Players[i].IsReady = serverMsg.data.ready;
                 }
+            }
+            else if (sMessage.type == ServerMessageType.ROOM_CREATE)
+            {
+                ServerMessage<string> serverMsg = Newtonsoft.Json.JsonConvert.DeserializeObject<ServerMessage<string>>(result);
+                Debug.Log("[PlayerManager] Room Create received. Code: " + serverMsg.data);
             }
         }
 
