@@ -109,8 +109,6 @@ namespace SpiritLevel.Player
             return false;
         }
 
-        public void SendHapticFeedback<T>(string uuid, byte[] data)
-        
         public void SendData(string data )
         {
             webSocket.SendText(data);
