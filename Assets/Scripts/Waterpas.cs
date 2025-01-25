@@ -43,12 +43,10 @@ public class Waterpas : MonoBehaviour
     [SerializeField, Tooltip("Multiplier used for torque")]
     internal float torqueMultiplier;
 
-
     /// <summary>
     /// Input queried from update loop
     /// </summary>
     private Vector2 lastInput = Vector2.zero;
-    private Vector2 latestDeltas = Vector2.zero;
 
     /// <summary>
     /// Called on the first active frame
@@ -105,11 +103,6 @@ public class Waterpas : MonoBehaviour
             //{
             horizontalInput = PlayerManager.Instance.Players[0].Input.Alpha;
             verticalInput = PlayerManager.Instance.Players[0].Input.Gamma;
-
-
-            latestDeltas = new Vector2(
-                (PlayerManager.Instance.Players[0].Input.Gamma - PlayerManager.Instance.Players[0].Input.previousGammaValue),
-               (PlayerManager.Instance.Players[0].Input.Alpha - PlayerManager.Instance.Players[0].Input.previousAlphaValue));
             //}
             ////If there are more then 2 players, split the input across 2 different players
             //else if (PlayerManager.Instance.Players.Count >= 2)
@@ -136,13 +129,37 @@ public class Waterpas : MonoBehaviour
         lastInput = new Vector2(horizontalInput, verticalInput);
     }
 
+
+    public ControlMode ActiveControlMode = ControlMode.LocalSpace;
+    public enum ControlMode
+    {
+        LocalSpace,
+        WorldSpace,
+        GyroData
+
+    }
+
     /// <summary>
     /// Called every fixed frame, rotates the actual level
     /// </summary>
     private void FixedUpdate()
     {
-        //PC+Keyboard controls
-        rigidBody.AddTorque(transform.forward * lastInput.x * torqueMultiplier, ForceMode.Impulse);
-        rigidBody.AddTorque(transform.right * lastInput.y * torqueMultiplier, ForceMode.Impulse);
+        if (ActiveControlMode == ControlMode.LocalSpace)
+        {
+            //PC+Keyboard controls Local space
+            rigidBody.AddTorque(transform.forward * lastInput.x * torqueMultiplier, ForceMode.Impulse);
+            rigidBody.AddTorque(transform.right * lastInput.y * torqueMultiplier, ForceMode.Impulse);
+        }
+        else if (ActiveControlMode == ControlMode.WorldSpace)
+        {
+            //PC+Keyboard controls world space
+            rigidBody.AddTorque(Vector3.forward * lastInput.x * torqueMultiplier, ForceMode.Impulse);
+            rigidBody.AddTorque(Vector3.right * lastInput.y * torqueMultiplier, ForceMode.Impulse);
+        }
+        else if (ActiveControlMode == ControlMode.GyroData)
+        {
+            //Gyro controls
+
+        }
     }
 }
