@@ -6,5 +6,11 @@ namespace SpiritLevel.Networking
         public float alpha;
         public float beta;
         public float gamma;
+        public float accX;
+        public float accY;
+        public float accZ;
+        public float gyroX;
+        public float gyroY;
+        public float gyroZ;
     }
 }
