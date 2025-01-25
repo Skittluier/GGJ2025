@@ -4,8 +4,6 @@ using UnityEngine.UI;
 using SpiritLevel.Networking;
 using SpiritLevel.Player;
 using System.Collections.Generic;
-using UnityEditor.VersionControl;
-using System;
 
 public class Trash : Obstacle
 {
@@ -25,6 +23,7 @@ public class Trash : Obstacle
     private bool startedTimer;
     public Slider progressBar;
     public float ProgressAddingValue = 0.01f;
+    private GameObject shakeIndication;
     private void OnTriggerEnter(Collider collision)
     {
         var hitLayerMask = 1 << collision.gameObject.layer;
@@ -68,7 +67,8 @@ public class Trash : Obstacle
         {
             if (bubble.player.Input.IsShaking(out float magnitude))
             {
-                progressBar.value += ProgressAddingValue;
+                magnitude = Mathf.Clamp(magnitude, PlayerInput.MINIMUM_SHAKE_MAGNITUDE, PlayerInput.MAXIMUM_SHAKE_MAGNITUDE);
+                progressBar.value += ProgressAddingValue * (magnitude * 0.01f);
             }
         }
     }
@@ -107,6 +107,7 @@ public class Trash : Obstacle
 
             string data = Newtonsoft.Json.JsonConvert.SerializeObject(message);
             PlayerManager.Instance.SendData(data);
+            BubbleRigidbody.WakeUp();
 
         }
     }
