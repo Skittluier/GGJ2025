@@ -1,3 +1,5 @@
+using SpiritLevel.Networking;
+using SpiritLevel.Player;
 using TMPro;
 using UnityEngine;
 
@@ -37,7 +39,7 @@ public class Game : MonoBehaviour
     /// <summary>
     /// The current GameState of the game
     /// </summary>
-    internal GameState CurrentGameState = GameState.Intro;
+    internal GameState CurrentGameState = GameState.INTRO;
 
     /// <summary>
     /// Called from the start, Starts the game right away on scene load
@@ -47,7 +49,7 @@ public class Game : MonoBehaviour
         Instance = this;
 
         //Set intro state
-        CurrentGameState = GameState.Intro;
+        UpdateGameState(GameState.INTRO);
     }
 
     /// <summary>
@@ -56,7 +58,7 @@ public class Game : MonoBehaviour
     public void StartCountdownSequence()
     {
         //Set countdown state
-        CurrentGameState = GameState.Countdown;
+        UpdateGameState(GameState.COUNTDOWN);
 
         //Set countdown timestamp
         startingTimestamp = countdownTime;
@@ -68,7 +70,7 @@ public class Game : MonoBehaviour
     private void Update()
     {
         //If the game hasn't started, perform startup logic
-        if (CurrentGameState == GameState.Countdown)
+        if (CurrentGameState == GameState.COUNTDOWN)
         {
             //If a starting timestamp is present, apply game cooldown
             if (startingTimestamp > 0)
@@ -93,7 +95,7 @@ public class Game : MonoBehaviour
             }
         }
         //Perform game logic for when the game is running
-        else if (CurrentGameState == GameState.Gameplay)
+        else if (CurrentGameState == GameState.GAMEPLAY)
         {
             //Lower the current game time
             endGameTimestamp = Mathf.Clamp(endGameTimestamp - Time.deltaTime, 0, roundTime);
@@ -106,7 +108,7 @@ public class Game : MonoBehaviour
                 LoseGame();
         }
         //Outro logic
-        else if (CurrentGameState == GameState.Outro)
+        else if (CurrentGameState == GameState.OUTRO)
         {
 
         }
@@ -118,7 +120,7 @@ public class Game : MonoBehaviour
     private void StartGame()
     {
         //Indicate that the game has started
-        CurrentGameState = GameState.Gameplay;
+        UpdateGameState(GameState.GAMEPLAY);
 
         //Assign the round time
         endGameTimestamp = roundTime;
@@ -130,7 +132,7 @@ public class Game : MonoBehaviour
     public void WinGame()
     {
         //Indicate that the game has finished
-        CurrentGameState = GameState.Outro;
+        UpdateGameState(GameState.OUTRO);
 
         //Send win signal to the Animator
         gameUIAnimator.SetTrigger("Win Game");
@@ -143,10 +145,20 @@ public class Game : MonoBehaviour
     private void LoseGame()
     {
         //Indicate that the game has finished
-        CurrentGameState = GameState.Outro;
+        UpdateGameState(GameState.OUTRO);
     
         //Send lose signal to the Animator
         gameUIAnimator.SetTrigger("Lose Game");
+    }
+
+    private void UpdateGameState(GameState newState)
+    {
+        UnityMessage<int> unityMessage = new UnityMessage<int>();
+        unityMessage.type = UnityMessageType.GAME_STATE_UPDATE;
+        unityMessage.data = (int)newState;
+
+        PlayerManager.Instance.SendData(Newtonsoft.Json.JsonConvert.SerializeObject(unityMessage));
+        CurrentGameState = newState;
     }
 
     /// <summary>
@@ -154,9 +166,9 @@ public class Game : MonoBehaviour
     /// </summary>
     public enum GameState
     {
-        Intro,
-        Countdown,
-        Gameplay,
-        Outro,
+        INTRO,
+        COUNTDOWN,
+        GAMEPLAY,
+        OUTRO,
     }
 }
