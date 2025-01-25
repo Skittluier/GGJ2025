@@ -45,6 +45,10 @@ namespace SpiritLevel.Player
                 if (webSocket.State != WebSocketState.Open && webSocket.State != WebSocketState.Connecting)
                     ConnectToWebServer();
             }
+
+            for (int i = 0; i < Players.Count; i++)
+                if (Players[i].Input.IsShaking(out float shakeMag))
+                    Debug.Log($"Player[{i}] Shake Mag: {shakeMag}");
         }
 
         private void WebSocket_OnMessage(byte[] data)
@@ -64,9 +68,7 @@ namespace SpiritLevel.Player
                         if (!Players[i].UUID.Equals(serverMsg.data[j].uuid))
                             continue;
 
-                        Players[i].Input.Alpha = serverMsg.data[j].alpha;
-                        Players[i].Input.Beta = serverMsg.data[j].beta;
-                        Players[i].Input.Gamma = serverMsg.data[j].gamma;
+                        Players[i].Input.UpdateOrientationValues(serverMsg.data[j].alpha, serverMsg.data[j].beta, serverMsg.data[j].gamma);
                         Players[i].Input.Accelerometer = new Vector3(serverMsg.data[j].accX, serverMsg.data[j].accY, serverMsg.data[j].accZ);
                         Players[i].Input.Gyroscope = new Vector3(serverMsg.data[j].gyroX, serverMsg.data[j].gyroY, serverMsg.data[j].gyroZ);
                     }
