@@ -1,7 +1,10 @@
+using SpiritLevel;
 using SpiritLevel.Networking;
 using SpiritLevel.Player;
+using System.Collections;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Audio;
 
 public class Game : MonoBehaviour
 {
@@ -25,6 +28,15 @@ public class Game : MonoBehaviour
 
     [SerializeField, Tooltip("Animator that controls the in-game UI")]
     private Animator gameUIAnimator;
+
+    private bool isPlayingOutro = false;
+
+    [SerializeField, Tooltip("A reference to the main camera's animator.")]
+    private Animator mainCameraAnimator;
+
+    [Header("Audio")]
+    [SerializeField, Tooltip("The voice being played whenever the bubble is free.")]
+    private AudioResource bubbleVictoryAudioResource;
 
     /// <summary>
     /// Timestamp for starting the game
@@ -63,7 +75,7 @@ public class Game : MonoBehaviour
         //Set countdown timestamp
         startingTimestamp = countdownTime;
     }
-    
+
     /// <summary>
     /// Called every frame
     /// </summary>
@@ -101,16 +113,38 @@ public class Game : MonoBehaviour
             endGameTimestamp = Mathf.Clamp(endGameTimestamp - Time.deltaTime, 0, roundTime);
 
             //Update amount of time left in the game on the in-game UI
-            gameTimeText.text = string.Format("You have: {0:0.0} seconds left!",endGameTimestamp);
+            gameTimeText.text = string.Format("You have: {0:0.0} seconds left!", endGameTimestamp);
 
             //If the gametime is getting below 0, the game round is over and the players have lost
-            if(endGameTimestamp <= 0)
+            if (endGameTimestamp <= 0)
                 LoseGame();
         }
         //Outro logic
         else if (CurrentGameState == GameState.OUTRO)
         {
+            if (!isPlayingOutro)
+            {
+                isPlayingOutro = true;
 
+                mainCameraAnimator.enabled = false;
+
+                GlobalAudio.Instance.PlayAudioResource(bubbleVictoryAudioResource);
+                CameraHandler.Instance.FocusOnPlayer();
+
+                Bubble firstPlayerBubble = PlayerManager.Instance?.Players[0]?.Bubble;
+
+                if (!firstPlayerBubble)
+                    return;
+
+                StartCoroutine(DoOutroAnimation());
+                IEnumerator DoOutroAnimation()
+                {
+                    firstPlayerBubble.SetExpression(Bubble.Expression.Blink, 6f);
+                    yield return new WaitForSeconds(6f);
+
+                    firstPlayerBubble.ExecuteTwerk();
+                }
+            }
         }
     }
 
@@ -129,6 +163,7 @@ public class Game : MonoBehaviour
     /// <summary>
     /// This function executes the winning sequence
     /// </summary>
+    [ContextMenu("Win Game")]
     public void WinGame()
     {
         //Indicate that the game has finished
@@ -146,7 +181,7 @@ public class Game : MonoBehaviour
     {
         //Indicate that the game has finished
         UpdateGameState(GameState.OUTRO);
-    
+
         //Send lose signal to the Animator
         gameUIAnimator.SetTrigger("Lose Game");
     }

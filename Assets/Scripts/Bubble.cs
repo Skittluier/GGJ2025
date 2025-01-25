@@ -21,6 +21,16 @@ public class Bubble : MonoBehaviour
     [SerializeField, Tooltip("All the possible face configurations for the bubble")]
     private ExpressionSet[] expressionSprites;
 
+    [SerializeField, Tooltip("This is for visuals which is EVERYTHING except for the twerk animation.")]
+    private GameObject generalVisualsGameObject;
+
+    [SerializeField, Tooltip("The game object with the twerk animation.")]
+    private GameObject twerkGameObject;
+
+    [SerializeField]
+    private AudioSource audioSource;
+
+
     /// <summary>
     /// The current expression of the bubble
     /// </summary>
@@ -95,6 +105,15 @@ public class Bubble : MonoBehaviour
             //Set expression timer
             expressionTimer = time;
         }
+    }
+
+    /// <summary>
+    /// Executes the twerk animation on the player.
+    /// </summary>
+    public void ExecuteTwerk()
+    {
+        generalVisualsGameObject.SetActive(false);
+        twerkGameObject.SetActive(true);
     }
 
     /// <summary>
