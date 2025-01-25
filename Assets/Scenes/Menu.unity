@@ -436,8 +436,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mainMenuSceneIndex: 0
   gameplayLevelIndex: 1
-  JoinGamePanel: {fileID: 648687379}
-  MainMenuPanel: {fileID: 241464045}
 --- !u!1 &987595159
 GameObject:
   m_ObjectHideFlags: 0
@@ -1003,9 +1001,56 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1516891303}
   m_CullTransparentMesh: 1
+--- !u!1 &2022211116
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2022211118}
+  - component: {fileID: 2022211117}
+  m_Layer: 0
+  m_Name: InputManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &2022211117
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2022211116}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 573c6eb5e7e6b524cace8253f76b0a6f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  webSocketURL: 'wss://rational-openly-colt.ngrok-free.app/api/server '
+  players: []
+--- !u!4 &2022211118
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2022211116}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
   - {fileID: 1034709798}
   - {fileID: 673872065}
+  - {fileID: 2022211118}
