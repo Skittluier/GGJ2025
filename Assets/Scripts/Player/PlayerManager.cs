@@ -9,7 +9,6 @@ namespace SpiritLevel.Player
 
     public class PlayerManager : Singleton<PlayerManager>
     {
-        
         private WebSocket webSocket;
 
         [SerializeField, Tooltip("The websocket URL for the controls.")]
@@ -23,6 +22,9 @@ namespace SpiritLevel.Player
 
         internal delegate void OnPlayerLeftMethod(string playerUUID);
         internal OnPlayerLeftMethod OnPlayerLeft;
+
+        internal delegate void OnRoomCodeUpdatedMethod(string roomCode);
+        internal OnRoomCodeUpdatedMethod OnRoomCodeUpdated;
 
         private bool tryingToConnect = false;
 
@@ -48,10 +50,6 @@ namespace SpiritLevel.Player
                 if (webSocket.State != WebSocketState.Open && webSocket.State != WebSocketState.Connecting)
                     ConnectToWebServer();
             }
-
-            for (int i = 0; i < Players.Count; i++)
-                if (Players[i].Input.IsShaking(out float shakeMag))
-                    Debug.Log($"Player[{i}] Shake Mag: {shakeMag}");
         }
 
         private void WebSocket_OnMessage(byte[] data)
@@ -81,7 +79,7 @@ namespace SpiritLevel.Player
             {
                 ServerMessage<PlayerStatusUpdateData> playerStatusUpdateData = Newtonsoft.Json.JsonConvert.DeserializeObject<ServerMessage<PlayerStatusUpdateData>>(result);
 
-                Debug.Log($"[InputManager] Player Status Update: {playerStatusUpdateData.type} | ID: {playerStatusUpdateData.data.id} | UUID: {playerStatusUpdateData.data.uuid}");
+                Debug.Log($"[PlayerManager] Player Status Update: {playerStatusUpdateData.type} | ID: {playerStatusUpdateData.data.id} | UUID: {playerStatusUpdateData.data.uuid}");
 
                 if (sMessage.type == ServerMessageType.PLAYER_JOINED)
                 {
@@ -95,6 +93,26 @@ namespace SpiritLevel.Player
                     Players.RemoveAt(inputIndex);
                     OnPlayerLeft?.Invoke(playerStatusUpdateData.data.uuid);
                 }
+            }
+            else if (sMessage.type == ServerMessageType.PLAYER_READY)
+            {
+                ServerMessage<PlayerStatusUpdateReadyData> serverMsg = Newtonsoft.Json.JsonConvert.DeserializeObject<ServerMessage<PlayerStatusUpdateReadyData>>(result);
+
+                Debug.Log("[PlayerManager] Player Ready changed. UUID: " + serverMsg.data.uuid);
+
+                for (int i = 0; i < Players.Count; i++)
+                {
+                    //Check which player sent the message
+                    if (Players[i].UUID == serverMsg.data.uuid)
+                        Players[i].IsReady = serverMsg.data.ready;
+                }
+            }
+            else if (sMessage.type == ServerMessageType.ROOM_CREATE)
+            {
+                ServerMessage<string> serverMsg = Newtonsoft.Json.JsonConvert.DeserializeObject<ServerMessage<string>>(result);
+                Debug.Log("[PlayerManager] Room Create received. Code: " + serverMsg.data);
+
+                OnRoomCodeUpdated?.Invoke(serverMsg.data);
             }
         }
 
@@ -114,8 +132,8 @@ namespace SpiritLevel.Player
             return false;
         }
 
-        
-        public void SendData(string data )
+
+        public void SendData(string data)
         {
             webSocket.SendText(data);
         }
@@ -127,18 +145,18 @@ namespace SpiritLevel.Player
 
         private void WebSocket_OnClose(WebSocketCloseCode closeCode)
         {
-            Debug.Log("[InputManager] Websocket Closed. Code: " + closeCode);
+            Debug.Log("[PlayerManager] Websocket Closed. Code: " + closeCode);
             Players.Clear();
         }
 
         private void WebSocket_OnOpen()
         {
-            Debug.Log("[InputManager] Websocket Open.");
+            Debug.Log("[PlayerManager] Websocket Open.");
         }
 
         private void WebSocket_OnError(string errorMsg)
         {
-            Debug.Log("[InputManager] Websocket Error: " + errorMsg);
+            Debug.Log("[PlayerManager] Websocket Error: " + errorMsg);
         }
 
         private void ConnectToWebServer()
@@ -152,10 +170,10 @@ namespace SpiritLevel.Player
 
         private async void ConnectToWebSocket()
         {
-            Debug.Log("[InputManager] Trying to connect...");
+            Debug.Log("[PlayerManager] Trying to connect...");
             await webSocket.Connect();
             await Task.Delay(1000);
-            Debug.Log("[InputManager] Done trying to connect.");
+            Debug.Log("[PlayerManager] Done trying to connect.");
 
             tryingToConnect = false;
         }

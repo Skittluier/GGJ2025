@@ -1,30 +1,71 @@
-using UnityEngine;
-using UnityEngine.SceneManagement;
-
-public class Menu : MonoBehaviour
+namespace SpiritLevel
 {
-    [Header("Scene Indexes")]
+    using SpiritLevel.Player;
+    using System.Collections;
+    using TMPro;
+    using UnityEngine;
+    using UnityEngine.SceneManagement;
 
-    [SerializeField]
-    private int mainMenuSceneIndex;
-
-    [SerializeField]
-    private int gameplayLevelIndex;
-
-    [SerializeField]
-    private GameObject JoinGamePanel;
-    [SerializeField]
-    private GameObject MainMenuPanel;
-
-    public void EnableJoinScreen()
+    public class Menu : MonoBehaviour
     {
-        MainMenuPanel.SetActive(false);
-        JoinGamePanel.SetActive(true);
-    }
+        [Header("Scene Indexes")]
 
-    public void GoToGameplayScene()
-    {
-        SceneManager.LoadScene(gameplayLevelIndex);
+        [SerializeField]
+        private int mainMenuSceneIndex;
+
+        [SerializeField]
+        private int gameplayLevelIndex;
+
+        [SerializeField]
+        private TMP_Text scanToJoinText;
+        private string defaultScanToJoinText;
+
+
+        private IEnumerator Start()
+        {
+            defaultScanToJoinText = scanToJoinText.text;
+
+            while (PlayerManager.Instance == null)
+                yield return null;
+
+            PlayerManager.Instance.OnRoomCodeUpdated += UpdateScanToJoinText;
+        }
+
+        private void OnDestroy()
+        {
+            PlayerManager.Instance.OnRoomCodeUpdated -= UpdateScanToJoinText;
+        }
+
+        private void UpdateScanToJoinText(string roomCode)
+        {
+            scanToJoinText.text = string.Format(defaultScanToJoinText, roomCode);
+        }
+
+        public void Update()
+        {
+            if (PlayerManager.Instance.Players.Count > 0)
+            {
+                bool allPlayersReady = true;
+
+                //Loop over all players and check if ready
+                for (int i = 0; i < PlayerManager.Instance.Players.Count; i++)
+                {
+                    if (!PlayerManager.Instance.Players[i].IsReady)
+                    {
+                        allPlayersReady = false;
+                        break;
+                    }
+                }
+
+                // All players ready!
+                if (allPlayersReady)
+                    SceneManager.LoadScene(gameplayLevelIndex);
+            }
+        }
+
+        public void GoToGameplayScene()
+        {
+            SceneManager.LoadScene(gameplayLevelIndex);
+        }
     }
 }
-                                                     

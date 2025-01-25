@@ -4,7 +4,6 @@ using UnityEngine.UI;
 using SpiritLevel.Networking;
 using SpiritLevel.Player;
 using System.Collections.Generic;
-using UnityEditor.VersionControl;
 
 public class Trash : Obstacle
 {
@@ -24,6 +23,7 @@ public class Trash : Obstacle
     private bool startedTimer;
     public Slider progressBar;
     public float ProgressAddingValue = 0.01f;
+    private GameObject shakeIndication;
     private void OnTriggerEnter(Collider collision)
     {
         var hitLayerMask = 1 << collision.gameObject.layer;
@@ -58,33 +58,38 @@ public class Trash : Obstacle
         startTime = Time.time;
         progressBar.value = 0;
         progressBar.gameObject.SetActive(true);
-        UnityMessage<Dictionary<string, float>> message = new UnityMessage<Dictionary<string, float>>()
-        {
-            type = UnityMessageType.VIBRATION_START,
-            data = new Dictionary<string, float>()
-            {
-                { bubble.player.UUID, 5000f }
-            }
-        };
-        string data = Newtonsoft.Json.JsonConvert.SerializeObject(message);
-        PlayerManager.Instance.SendData(data);
+        HapticFeedbackCall();
     }
 
     public void LateUpdate()
     {
         if (canStartShaking)
         {
-            if (StillShaking())
+            if (bubble.player.Input.IsShaking(out float magnitude))
             {
-                progressBar.value += ProgressAddingValue;
+                magnitude = Mathf.Clamp(magnitude, PlayerInput.MINIMUM_SHAKE_MAGNITUDE, PlayerInput.MAXIMUM_SHAKE_MAGNITUDE);
+                progressBar.value += ProgressAddingValue * (magnitude * 0.01f);
             }
         }
     }
 
-    public bool StillShaking()
+    private void HapticFeedbackCall()
     {
-        // if mobile still shaking
-        return true;
+        if (bubble.player.Input.IsShaking(out float magnitude))
+        {
+            UnityMessage<Dictionary<string, float>> message = new UnityMessage<Dictionary<string, float>>()
+            {
+                type = UnityMessageType.VIBRATION_START,
+                data = new Dictionary<string, float>()
+            {
+                { bubble.player.UUID, 250f }
+            }
+            };
+            string data = Newtonsoft.Json.JsonConvert.SerializeObject(message);
+            PlayerManager.Instance.SendData(data);
+
+            TimerManager.AddTimer(HapticFeedbackCall, .5f);
+        }
     }
 
     private void BreakObject()
@@ -102,6 +107,7 @@ public class Trash : Obstacle
 
             string data = Newtonsoft.Json.JsonConvert.SerializeObject(message);
             PlayerManager.Instance.SendData(data);
+            BubbleRigidbody.WakeUp();
 
         }
     }
