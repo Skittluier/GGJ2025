@@ -157,7 +157,7 @@ public class Game : MonoBehaviour
         unityMessage.type = UnityMessageType.GAME_STATE_UPDATE;
         unityMessage.data = (int)newState;
 
-        PlayerManager.Instance.SendData(Newtonsoft.Json.JsonConvert.SerializeObject(unityMessage));
+        PlayerManager.Instance?.SendData(Newtonsoft.Json.JsonConvert.SerializeObject(unityMessage));
         CurrentGameState = newState;
     }
 
