@@ -16,14 +16,13 @@ public class Bubble : MonoBehaviour
     private Transform VisualsRoot;
 
     [SerializeField, Tooltip("References to the Renderers on the bubble")]
-    private SpriteRenderer rootRenderer, leftEyeRenderer, rightEyeRenderer, mouthRenderer;
+    private SpriteRenderer rootRenderer, expressionRenderer;
 
     [SerializeField, Tooltip("All the possible face configurations for the bubble")]
     private ExpressionSet[] expressionSprites;
 
-
     /// <summary>
-    /// 
+    /// Called every physics update
     /// </summary>
     private void FixedUpdate()
     {
@@ -74,29 +73,25 @@ public class Bubble : MonoBehaviour
 
         //If an expression has been found, apply its
         if (expressionSet.HasValue)
-        {
-            leftEyeRenderer.sprite = expressionSet.Value.LeftEyeSprite;
-            rightEyeRenderer.sprite = expressionSet.Value.RightEyeSprite;
-            mouthRenderer.sprite = expressionSet.Value.MouthSprite;
-        }
+            expressionRenderer.sprite = expressionSet.Value.ExpressionSprite;
     }
 
+    /// <summary>
+    /// Struct for holding 
+    /// </summary>
+    [System.Serializable]
     public struct ExpressionSet
     {
         [Tooltip("The Expression this belongs to")]
         public Expression Expression;
 
-        [Tooltip("Sprite for the mouth")]
-        public Sprite MouthSprite;
-
-        [Tooltip("Sprite for the left eye")]
-        public Sprite LeftEyeSprite;
-
-        [Tooltip("Sprite for the right eye")]
-        public Sprite RightEyeSprite;
-
+        [Tooltip("Sprite for the expression of the player")]
+        public Sprite ExpressionSprite;
     }
 
+    /// <summary>
+    /// Enum set for representing different expressions
+    /// </summary>
     public enum Expression
     {
         Normal,
