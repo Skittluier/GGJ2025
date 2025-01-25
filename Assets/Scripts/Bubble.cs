@@ -1,5 +1,6 @@
 using SpiritLevel;
 using UnityEngine;
+using UnityEngine.Audio;
 
 public class Bubble : MonoBehaviour
 {
@@ -29,6 +30,13 @@ public class Bubble : MonoBehaviour
 
     [SerializeField]
     private AudioSource audioSource;
+
+    [Header("Audio")]
+    [SerializeField, Tooltip("Minimum velocity needed for the impact sound to be invoked.")]
+    private float minImpactMagnitude;
+
+    [SerializeField]
+    private AudioResource impactVoiceAudioResource;
 
 
     /// <summary>
@@ -114,6 +122,18 @@ public class Bubble : MonoBehaviour
     {
         generalVisualsGameObject.SetActive(false);
         twerkGameObject.SetActive(true);
+    }
+
+    /// <summary>
+    /// For the impact sounds.
+    /// </summary>
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (Game.Instance != null && Game.Instance.CurrentGameState == Game.GameState.GAMEPLAY && collision.impulse.magnitude >= minImpactMagnitude && !audioSource.isPlaying)
+        {
+            audioSource.resource = impactVoiceAudioResource;
+            audioSource.Play();
+        }
     }
 
     /// <summary>

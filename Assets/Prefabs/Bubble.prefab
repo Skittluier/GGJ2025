@@ -310,6 +310,8 @@ MonoBehaviour:
   generalVisualsGameObject: {fileID: 4072414058311836547}
   twerkGameObject: {fileID: 8803813858570063057}
   audioSource: {fileID: 3662855518767105170}
+  minImpactMagnitude: 0.1
+  impactVoiceAudioResource: {fileID: 6418180475301049370, guid: 16cf5ace5f657d04595e2eac9a2ce6fa, type: 2}
 --- !u!54 &4053661397993313834
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -394,7 +396,7 @@ AudioSource:
     m_Curve:
     - serializedVersion: 3
       time: 0
-      value: 1
+      value: 0.5
       inSlope: 0
       outSlope: 0
       tangentMode: 0
