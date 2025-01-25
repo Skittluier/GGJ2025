@@ -29,14 +29,14 @@ public class Bubble : MonoBehaviour
     private GameObject twerkGameObject;
 
     [SerializeField]
-    private AudioSource audioSource;
+    private AudioSource voiceAudioSource, environmentAudioSource;
 
     [Header("Audio")]
     [SerializeField, Tooltip("Minimum velocity needed for the impact sound to be invoked.")]
     private float minImpactMagnitude;
 
     [SerializeField]
-    private AudioResource impactVoiceAudioResource;
+    private AudioResource impactVoiceAudioResource, impactAudioResource;
 
 
     /// <summary>
@@ -129,10 +129,13 @@ public class Bubble : MonoBehaviour
     /// </summary>
     private void OnCollisionEnter(Collision collision)
     {
-        if (Game.Instance != null && Game.Instance.CurrentGameState == Game.GameState.GAMEPLAY && collision.impulse.magnitude >= minImpactMagnitude && !audioSource.isPlaying)
+        if (Game.Instance != null && Game.Instance.CurrentGameState == Game.GameState.GAMEPLAY && collision.impulse.magnitude >= minImpactMagnitude && !voiceAudioSource.isPlaying)
         {
-            audioSource.resource = impactVoiceAudioResource;
-            audioSource.Play();
+            voiceAudioSource.resource = impactVoiceAudioResource;
+            voiceAudioSource.Play();
+
+            environmentAudioSource.resource = impactAudioResource;
+            environmentAudioSource.Play();
         }
     }
 
