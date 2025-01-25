@@ -16,7 +16,7 @@ public class Bubble : MonoBehaviour
     private Transform VisualsRoot;
 
     [SerializeField, Tooltip("References to the Renderers on the bubble")]
-    private SpriteRenderer rootRenderer, expressionRenderer;
+    private MeshRenderer rootRenderer, expressionRenderer;
 
     [SerializeField, Tooltip("All the possible face configurations for the bubble")]
     private ExpressionSet[] expressionSprites;
@@ -100,7 +100,7 @@ public class Bubble : MonoBehaviour
         if (expressionSet.HasValue)
         {
             //Set expression
-            expressionRenderer.sprite = expressionSet.Value.ExpressionSprite;
+            expressionRenderer.material.SetTexture("_Texture2D", expressionSet.Value.ExpressionTexture);
 
             //Set expression timer
             expressionTimer = time;
@@ -126,7 +126,7 @@ public class Bubble : MonoBehaviour
         public Expression Expression;
 
         [Tooltip("Sprite for the expression of the player")]
-        public Sprite ExpressionSprite;
+        public Texture2D ExpressionTexture;
     }
 
     /// <summary>

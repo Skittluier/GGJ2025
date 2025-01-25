@@ -2,7 +2,9 @@ using NativeWebSocket;
 using RUMBLE.Utilities;
 using SpiritLevel.Networking;
 using SpiritLevel.Player;
+using System;
 using System.Collections;
+using UnityEditor.ShaderGraph.Internal;
 using UnityEngine;
 using static TMPro.SpriteAssetUtilities.TexturePacker_JsonArray;
 
@@ -10,9 +12,6 @@ public class Waterpas : MonoBehaviour
 {
     [SerializeField, Tooltip("The rigidbody on the level")]
     private Rigidbody rigidBody;
-
-    [SerializeField, Tooltip("The rotation strength of the level")]
-    private float rotationStrength;
 
     [SerializeField, Tooltip("Enables keyboard input in the edito")]
     private bool enableEditorInput = false;
@@ -48,6 +47,8 @@ public class Waterpas : MonoBehaviour
     /// </summary>
     private Vector2 lastInput = Vector2.zero;
 
+    private Quaternion initialRotation;
+
     /// <summary>
     /// Called on the first active frame
     /// </summary>
@@ -60,6 +61,8 @@ public class Waterpas : MonoBehaviour
             return;
         }
 #endif
+
+        initialRotation = transform.rotation;
 
         //Attach rigidbody
         angularPIDController.AttachedRigidBody = rigidBody;
@@ -88,34 +91,11 @@ public class Waterpas : MonoBehaviour
     private void Update()
     {
         //Stop processing input if the game hasn't started yet
-        //if (Game.Instance?.CurrentGameState != Game.GameState.Gameplay)
-        //    return;
+        if (Game.Instance?.CurrentGameState != Game.GameState.GAMEPLAY)
+            return;
 
         float horizontalInput = 0;
         float verticalInput = 0;
-
-#if UNITY_EDITOR
-        if (!enableEditorInput)
-        {
-#endif
-            //Just pick the input of the first player
-            //if (PlayerManager.Instance.Players.Count == 1)
-            //{
-            horizontalInput = PlayerManager.Instance.Players[0].Input.Alpha;
-            verticalInput = PlayerManager.Instance.Players[0].Input.Gamma;
-            //}
-            ////If there are more then 2 players, split the input across 2 different players
-            //else if (PlayerManager.Instance.Players.Count >= 2)
-            //{
-            //    //Pick alpha value from first player
-            //    horizontalInput = PlayerManager.Instance.Players[0].Input.Alpha;
-
-            //    //Pick gamma value from player
-            //    verticalInput = PlayerManager.Instance.Players[1].Input.Gamma;
-            //}
-#if UNITY_EDITOR
-        }
-#endif
 
 #if UNITY_EDITOR
         //Set editor keyboard data for testing
@@ -140,10 +120,42 @@ public class Waterpas : MonoBehaviour
     }
 
     /// <summary>
+    /// Clamp value for the rotation delta
+    /// </summary>
+    public float RotationDeltaClamp = 3;
+
+    /// <summary>
+    /// Current beta delta
+    /// </summary>
+    private float currentBetaDelta = 0f;
+
+    /// <summary>
+    /// Current gamma delta
+    /// </summary>
+    private float currentGammaDelta = 0f;
+
+    /// <summary>
+    /// Current gamma delta velocity
+    /// </summary>
+    private float deltaGammaVelocity;
+
+    /// <summary>
+    /// Current beta delta velocity
+    /// </summary>
+    private float deltaBetaVelocity;
+
+    public float Smooooooooth;
+    public float DeltaMultiplier;
+
+    /// <summary>
     /// Called every fixed frame, rotates the actual level
     /// </summary>
     private void FixedUpdate()
     {
+        //Stop processing input if the game hasn't started yet
+        if (Game.Instance?.CurrentGameState != Game.GameState.GAMEPLAY)
+            return;
+
         if (ActiveControlMode == ControlMode.LocalSpace)
         {
             //PC+Keyboard controls Local space
@@ -158,8 +170,64 @@ public class Waterpas : MonoBehaviour
         }
         else if (ActiveControlMode == ControlMode.GyroData)
         {
-            //Gyro controls
+            Vector3 gyroInput = Vector3.zero;
 
+            //Just pick the input of the first player
+            if (PlayerManager.Instance.Players.Count == 1)
+            {
+                float gammaDelta = Mathf.Clamp(-(PlayerManager.Instance.Players[0].Input.Gamma - PlayerManager.Instance.Players[0].Input.previousGammaValue), -RotationDeltaClamp, RotationDeltaClamp) * DeltaMultiplier;
+
+                float betaDelta = Mathf.Clamp((PlayerManager.Instance.Players[0].Input.Alpha - PlayerManager.Instance.Players[0].Input.previousAlphaValue), -RotationDeltaClamp, RotationDeltaClamp) * DeltaMultiplier;
+                
+                if (Mathf.Abs(currentGammaDelta) <= 0.05f)
+                    currentGammaDelta = 0;
+
+                currentBetaDelta = Mathf.SmoothDamp(currentBetaDelta, betaDelta, ref deltaBetaVelocity, Time.deltaTime * Smooooooooth);
+                currentGammaDelta = Mathf.SmoothDamp(currentGammaDelta, gammaDelta, ref deltaGammaVelocity, Time.deltaTime * Smooooooooth);
+
+                //Gyro controls for singleplayer
+                gyroInput = new Vector3(currentGammaDelta, 0, currentBetaDelta);
+            }
+            //If there are more then 2 players, split the input across 2 different players
+            else if (PlayerManager.Instance.Players.Count >= 2)
+            {
+                //Gyro controls for mutliplayer
+                gyroInput = new Vector3(-PlayerManager.Instance.Players[0].Input.Gamma, 0, /*-PlayerManager.Instance.Players[1].Input.Beta*/0);
+
+            }
+            //Get the desired output
+            Quaternion outputRotation = GyroToUnity(Quaternion.Euler(gyroInput));
+
+            //Update error in the angular PID controller
+            Vector3 diffAngles = GyroToUnity(Quaternion.Euler(gyroInput)).eulerAngles;
+
+            //CHeck for angle flips to make sure the fastest rotation is taken instead of turning complete circles
+            if (diffAngles.x >= 180)
+                diffAngles.x = -(360 - diffAngles.x);
+
+            if (diffAngles.y >= 180)
+                diffAngles.y = -(360 - diffAngles.y);
+
+            if (diffAngles.z >= 180)
+                diffAngles.z = -(360 - diffAngles.z);
+
+            //Update rotation controller error
+            angularPIDController.AttachedRigidBody = rigidBody;
+            angularPIDController.UpdateError(diffAngles, Time.fixedDeltaTime);
+
+            //Add torque based on error
+            rigidBody.AddTorque(transform.forward * diffAngles.x * torqueMultiplier, ForceMode.Impulse);
+
+            //Add torque based on error
+            //rigidBody.AddRelativeTorque(angularPIDController.ControlValue * Time.fixedDeltaTime * torqueMultiplier, ForceMode.Impulse);
         }
+    }
+
+    /// <summary>
+    /// Converts weird ass gyro data to proper rotation
+    /// </summary>
+    private Quaternion GyroToUnity(Quaternion q)
+    {
+        return new Quaternion(q.x, q.y, -q.z, -q.w);
     }
 }
