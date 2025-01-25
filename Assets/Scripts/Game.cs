@@ -35,9 +35,9 @@ public class Game : MonoBehaviour
     private float endGameTimestamp = 0f;
 
     /// <summary>
-    /// Boolean to show if the game has started
+    /// The current GameState of the game
     /// </summary>
-    internal bool GameStarted = false;
+    internal GameState CurrentGameState = GameState.Intro;
 
     /// <summary>
     /// Called from the start, Starts the game right away on scene load
@@ -46,7 +46,8 @@ public class Game : MonoBehaviour
     {
         Instance = this;
 
-        GameStarted = false;
+        //Set intro state
+        CurrentGameState = GameState.Intro;
         startingTimestamp = countdownTime;
     }
 
@@ -56,7 +57,7 @@ public class Game : MonoBehaviour
     private void Update()
     {
         //If the game hasn't started, perform startup logic
-        if (!GameStarted)
+        if (CurrentGameState == GameState.Intro)
         {
             //If a starting timestamp is present, apply game cooldown
             if (startingTimestamp > 0)
@@ -81,15 +82,18 @@ public class Game : MonoBehaviour
             }
         }
         //Perform game logic for when the game is running
-        else if (GameStarted)
+        else if (CurrentGameState == GameState.Gameplay)
         {
             //Lower the current game time
             endGameTimestamp -= Mathf.Clamp(endGameTimestamp - Time.deltaTime, 0, roundTime);
 
             //Update amount of time left in the game on the in-game UI
             gameTimeText.text = string.Format("You have: {0:0.0} seconds left!",endGameTimestamp);
-        
-        
+        }
+        //Outro logic
+        else if (CurrentGameState == GameState.Outro)
+        {
+
         }
 
     }
@@ -100,7 +104,7 @@ public class Game : MonoBehaviour
     private void StartGame()
     {
         //Indicate that the game has started
-        GameStarted = true;
+        CurrentGameState = GameState.Gameplay;
     }
 
     /// <summary>
@@ -109,7 +113,7 @@ public class Game : MonoBehaviour
     private void EndGame()
     {
         //Indicate that the game has finished
-        GameStarted = false;
+        CurrentGameState = GameState.Outro;
     }
 
     public enum GameState
