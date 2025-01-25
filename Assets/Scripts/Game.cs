@@ -48,16 +48,30 @@ public class Game : MonoBehaviour
 
         //Set intro state
         CurrentGameState = GameState.Intro;
-        startingTimestamp = countdownTime;
     }
 
+    /// <summary>
+    /// Starts the countdown sequence for starting the game
+    /// </summary>
+    public void StartCountdownSequence()
+    {
+        //Set countdown state
+        CurrentGameState = GameState.Countdown;
+
+        //Send signal to start the countdown for the game
+        gameUIAnimator.SetTrigger("Start Countdown");
+
+        //Set countdown timestamp
+        startingTimestamp = countdownTime;
+    }
+    
     /// <summary>
     /// Called every frame
     /// </summary>
     private void Update()
     {
         //If the game hasn't started, perform startup logic
-        if (CurrentGameState == GameState.Intro)
+        if (CurrentGameState == GameState.Countdown)
         {
             //If a starting timestamp is present, apply game cooldown
             if (startingTimestamp > 0)
@@ -144,6 +158,7 @@ public class Game : MonoBehaviour
     public enum GameState
     {
         Intro,
+        Countdown,
         Gameplay,
         Outro,
     }
