@@ -14,8 +14,8 @@ namespace SpiritLevel.Input
         [SerializeField, Tooltip("The websocket URL for the controls.")]
         private string webSocketURL;
 
-        [SerializeField, ReadOnly]
-        private List<Player> players = new List<Player>();
+        [field: SerializeField, ReadOnly]
+        internal List<Player> Players { get; private set; } = new List<Player>();
 
         private bool tryingToConnect = false;
 
@@ -49,16 +49,16 @@ namespace SpiritLevel.Input
                 ServerMessage<InputData[]> serverMsg = Newtonsoft.Json.JsonConvert.DeserializeObject<ServerMessage<InputData[]>>(result);
 
                 // Processing all player inputs.
-                for (int i = 0; i < players.Count; i++)
+                for (int i = 0; i < Players.Count; i++)
                 {
                     for (int j = 0; j < serverMsg.data.Length; j++)
                     {
-                        if (!players[i].UUID.Equals(serverMsg.data[j].uuid))
+                        if (!Players[i].UUID.Equals(serverMsg.data[j].uuid))
                             continue;
 
-                        players[i].Input.Alpha = serverMsg.data[j].alpha;
-                        players[i].Input.Beta = serverMsg.data[j].beta;
-                        players[i].Input.Gamma = serverMsg.data[j].gamma;
+                        Players[i].Input.Alpha = serverMsg.data[j].alpha;
+                        Players[i].Input.Beta = serverMsg.data[j].beta;
+                        Players[i].Input.Gamma = serverMsg.data[j].gamma;
                     }
                 }
             }
@@ -69,9 +69,9 @@ namespace SpiritLevel.Input
                 Debug.Log($"[InputManager] Player Status Update: {playerStatusUpdateData.type} | UUID: {playerStatusUpdateData.data.uuid}");
 
                 if (sMessage.type == ServerMessageType.PLAYER_JOINED)
-                    players.Add(new Player() { UUID = playerStatusUpdateData.data.uuid });
+                    Players.Add(new Player() { UUID = playerStatusUpdateData.data.uuid });
                 else if (sMessage.type == ServerMessageType.PLAYER_LEFT && PlayerExists(playerStatusUpdateData.data.uuid, out int inputIndex))
-                    players.RemoveAt(inputIndex);
+                    Players.RemoveAt(inputIndex);
             }
         }
 
@@ -79,9 +79,9 @@ namespace SpiritLevel.Input
         {
             inputIndex = -1;
 
-            for (int i = 0; i < players.Count; i++)
+            for (int i = 0; i < Players.Count; i++)
             {
-                if (players[i].UUID.Equals(uuid))
+                if (Players[i].UUID.Equals(uuid))
                 {
                     inputIndex = i;
                     return true;
