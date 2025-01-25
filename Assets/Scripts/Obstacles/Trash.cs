@@ -59,7 +59,7 @@ public class Trash : Obstacle
         };
         object data = Newtonsoft.Json.JsonConvert.SerializeObject(message);
 
-        InputManager.Instance.SendHapticFeedback(data);
+        //InputManager.Instance.SendHapticFeedback(data);
     }
 
     public void Update()
