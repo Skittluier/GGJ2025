@@ -21,6 +21,9 @@ public class Game : MonoBehaviour
     [SerializeField, Tooltip("Text that shows that the players can start the game")]
     private TextMeshProUGUI startGameText;
 
+    [SerializeField, Tooltip("Text that shows that when the players lost the game")]
+    private TextMeshProUGUI gameLostText;
+
     [SerializeField, Tooltip("Animator that controls the in-game UI")]
     private Animator gameUIAnimator;
 
@@ -95,7 +98,6 @@ public class Game : MonoBehaviour
         {
 
         }
-
     }
 
     /// <summary>
@@ -116,6 +118,9 @@ public class Game : MonoBehaviour
         CurrentGameState = GameState.Outro;
     }
 
+    /// <summary>
+    /// Enum representing the current gameplay state
+    /// </summary>
     public enum GameState
     {
         Intro,
