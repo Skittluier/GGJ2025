@@ -7,8 +7,8 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: MAT_Pas
-  m_Shader: {fileID: -6465566751694194690, guid: d39f5aaa7404f2b44a13054a226042ce, type: 3}
+  m_Name: Outline
+  m_Shader: {fileID: -6465566751694194690, guid: efa319c826f38044598f8495e317d138, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
@@ -102,6 +102,7 @@ Material:
     - _GlossyReflections: 0
     - _Metallic: 0
     - _OcclusionStrength: 1
+    - _Offset: 0.05
     - _Parallax: 0.005
     - _QueueControl: 0
     - _QueueOffset: 0
@@ -116,15 +117,12 @@ Material:
     - _ZWrite: 1
     m_Colors:
     - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
-    - _Bubbula: {r: 0, g: 0, b: 0, a: 0}
-    - _Color: {r: 0.09411766, g: 0.10588236, b: 0.121568635, a: 1}
+    - _Color: {r: 0.19999999, g: 0.19999999, b: 0.19999999, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
-    - _Numbers: {r: 2, g: 0, b: 0, a: 0}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
-    - _Vector3: {r: -0.87, g: 1.23, b: 0.12, a: 0}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
---- !u!114 &3847177512630691999
+--- !u!114 &1823514752531222476
 MonoBehaviour:
   m_ObjectHideFlags: 11
   m_CorrespondingSourceObject: {fileID: 0}
