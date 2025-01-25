@@ -41,6 +41,9 @@ public class Game : MonoBehaviour
     [SerializeField, Tooltip("The voice being played whenever the bubble loses.")]
     private AudioResource bubbleLostAudioResource;
 
+    [SerializeField, Tooltip("Music audio source")]
+    private AudioSource musicAudioSource;
+
     /// <summary>
     /// Timestamp for starting the game
     /// </summary>
@@ -90,6 +93,9 @@ public class Game : MonoBehaviour
         //If the game hasn't started, perform startup logic
         if (CurrentGameState == GameState.COUNTDOWN)
         {
+            if (!musicAudioSource.isPlaying)
+                musicAudioSource.Play();
+
             //If a starting timestamp is present, apply game cooldown
             if (startingTimestamp > 0)
             {
@@ -128,6 +134,9 @@ public class Game : MonoBehaviour
         //Outro logic
         else if (CurrentGameState == GameState.OUTRO)
         {
+            if (musicAudioSource.isPlaying)
+                musicAudioSource.Stop();
+
             if (!isPlayingOutro)
             {
                 isPlayingOutro = true;
