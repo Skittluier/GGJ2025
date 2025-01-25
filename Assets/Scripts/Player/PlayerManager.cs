@@ -9,7 +9,6 @@ namespace SpiritLevel.Player
 
     public class PlayerManager : Singleton<PlayerManager>
     {
-
         private WebSocket webSocket;
 
         [SerializeField, Tooltip("The websocket URL for the controls.")]
@@ -23,6 +22,9 @@ namespace SpiritLevel.Player
 
         internal delegate void OnPlayerLeftMethod(string playerUUID);
         internal OnPlayerLeftMethod OnPlayerLeft;
+
+        internal delegate void OnRoomCodeUpdatedMethod(string roomCode);
+        internal OnRoomCodeUpdatedMethod OnRoomCodeUpdated;
 
         private bool tryingToConnect = false;
 
@@ -109,6 +111,8 @@ namespace SpiritLevel.Player
             {
                 ServerMessage<string> serverMsg = Newtonsoft.Json.JsonConvert.DeserializeObject<ServerMessage<string>>(result);
                 Debug.Log("[PlayerManager] Room Create received. Code: " + serverMsg.data);
+
+                OnRoomCodeUpdated?.Invoke(serverMsg.data);
             }
         }
 
