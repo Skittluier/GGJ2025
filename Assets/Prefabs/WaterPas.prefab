@@ -555,7 +555,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rigidBody: {fileID: 606342240476174305}
-  rotationStrength: 0.2
+  rotationStrength: 0.01
+  enableEditorInput: 0
 --- !u!1 &4809866542893871296
 GameObject:
   m_ObjectHideFlags: 0
