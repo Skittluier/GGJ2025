@@ -1,11 +1,5 @@
-using System;
 using System.Collections.Generic;
-using System.Threading;
-using Unity.VisualScripting;
 
-/// <summary>
-/// Timer system made by Geoffrey Hendrikx.
-/// </summary>
 namespace UnityEngine.Timers
 {
     public class TimerManager : Singleton<TimerManager>
