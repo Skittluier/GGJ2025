@@ -853,7 +853,7 @@
                 "m_Node": {
                     "m_Id": "ff20e508eab04c418d967d362c181464"
                 },
-                "m_SlotId": 0
+                "m_SlotId": 1
             }
         },
         {
@@ -937,7 +937,7 @@
                 "m_Node": {
                     "m_Id": "ff20e508eab04c418d967d362c181464"
                 },
-                "m_SlotId": 1
+                "m_SlotId": 0
             }
         },
         {
@@ -2993,7 +2993,7 @@
     "m_RefNameGeneratedByDisplayName": "Bubbula",
     "m_DefaultReferenceName": "_Bubbula",
     "m_OverrideReferenceName": "_BubblePosition0",
-    "m_GeneratePropertyBlock": true,
+    "m_GeneratePropertyBlock": false,
     "m_UseCustomSlotLabel": false,
     "m_CustomSlotLabel": "",
     "m_DismissedVersion": 0,
@@ -3133,10 +3133,10 @@
         "m_Expanded": true,
         "m_Position": {
             "serializedVersion": "2",
-            "x": 1060.0,
-            "y": 114.39989471435547,
-            "width": 208.0,
-            "height": 277.6000671386719
+            "x": 1051.199951171875,
+            "y": 159.19993591308595,
+            "width": 207.9998779296875,
+            "height": 277.5999755859375
         }
     },
     "m_Slots": [
@@ -5644,10 +5644,10 @@
         "m_Expanded": true,
         "m_Position": {
             "serializedVersion": "2",
-            "x": 2204.000244140625,
-            "y": 187.20001220703126,
+            "x": 2188.0,
+            "y": 152.79998779296876,
             "width": 208.0,
-            "height": 277.60003662109377
+            "height": 277.5999755859375
         }
     },
     "m_Slots": [
