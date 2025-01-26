@@ -65,10 +65,13 @@ public class Game : MonoBehaviour
 
     [Header("Audio")]
     [SerializeField, Tooltip("The voice being played whenever the bubble is free.")]
-    private AudioResource bubbleVictoryAudioResource;
+    private AudioResource bubbleVoiceVictoryAudioResource;
 
     [SerializeField, Tooltip("The voice being played whenever the bubble loses.")]
-    private AudioResource bubbleLostAudioResource;
+    private AudioResource bubbleVoiceLostAudioResource;
+
+    [SerializeField, Tooltip("The SFX that will be played on game over.")]
+    private AudioResource bubbleLostAudioResource, bubbleVictoryAudioResource;
 
     [SerializeField, Tooltip("Music audio source")]
     private AudioSource musicAudioSource;
@@ -214,6 +217,7 @@ public class Game : MonoBehaviour
 
                 mainCameraAnimator.enabled = false;
 
+                GlobalAudio.Instance.PlayAudioResource(lostGame ? bubbleVoiceLostAudioResource : bubbleVoiceVictoryAudioResource);
                 GlobalAudio.Instance.PlayAudioResource(lostGame ? bubbleLostAudioResource : bubbleVictoryAudioResource);
                 CameraHandler.Instance.FocusOnPlayer();
 

@@ -6,15 +6,23 @@ namespace SpiritLevel
     public class GlobalAudio : Singleton<GlobalAudio>
     {
         [SerializeField]
-        private AudioSource audioSource;
+        private AudioSource audioSource, audioSourceTwo;
 
 
         internal void PlayAudioResource(AudioResource audioResource)
         {
             Debug.Log("[GlobalAudio] Play resource: " + audioResource.name);
 
-            audioSource.resource = audioResource;
-            audioSource.Play();
+            if (!audioSource.isPlaying)
+            {
+                audioSource.resource = audioResource;
+                audioSource.Play();
+            }
+            else
+            {
+                audioSourceTwo.resource = audioResource;
+                audioSourceTwo.Play();
+            }
         }
     }
 }

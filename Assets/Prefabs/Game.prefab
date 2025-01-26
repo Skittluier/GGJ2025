@@ -306,7 +306,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   roundTime: 120
   countdownTime: 3
-  startGameText: {fileID: 0}
   gameUIAnimator: {fileID: 3310327616462177389}
   mainCameraAnimator: {fileID: 0}
   countdownParentGameObject: {fileID: 1720695247697100463}
@@ -315,14 +314,19 @@ MonoBehaviour:
   - {fileID: 3773228791381585090}
   - {fileID: 8381543810404178056}
   - {fileID: 5245399052789867928}
+  pasMaterial: {fileID: 0}
+  outlineMaterial: {fileID: 0}
+  cutoutShaderAppearanceDuration: 1
   timerGameObject: {fileID: 8317477842250945177}
   gameTimeText: {fileID: 3327644461175602621}
   timerFillImage: {fileID: 742194497827782374}
   timerStartFillColor: {r: 0.7372549, g: 0.99607843, b: 0.36078432, a: 1}
   timerEndFillColor: {r: 1, g: 0.36078432, b: 0.5921569, a: 1}
   timerText: {fileID: 3327644461175602621}
-  bubbleVictoryAudioResource: {fileID: 8300000, guid: 73affd18dfd08d946a09e00c3ed43256, type: 3}
-  bubbleLostAudioResource: {fileID: 6418180475301049370, guid: 7c19e60e5c2aaed419c31df373c9a08d, type: 2}
+  bubbleVoiceVictoryAudioResource: {fileID: 8300000, guid: 73affd18dfd08d946a09e00c3ed43256, type: 3}
+  bubbleVoiceLostAudioResource: {fileID: 6418180475301049370, guid: 7c19e60e5c2aaed419c31df373c9a08d, type: 2}
+  bubbleLostAudioResource: {fileID: 8300000, guid: 5b0c265cb3f1d064682a601423cd36fb, type: 3}
+  bubbleVictoryAudioResource: {fileID: 8300000, guid: 3ab28c4d474718e46830a2999c9fd1f2, type: 3}
   musicAudioSource: {fileID: 0}
 --- !u!1 &2803325938594047634
 GameObject:
