@@ -15,8 +15,6 @@ public class Trash : Obstacle
     [SerializeField]
     private float timeNeeded;
     [SerializeField]
-    private Collider obstacleCollider;
-    [SerializeField]
     private float ShakeAmount;
     private bool canStartShaking;
     private bool startedTimer;
