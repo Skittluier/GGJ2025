@@ -9,6 +9,7 @@ public class CameraAnimationCallbacks : MonoBehaviour
     [SerializeField]
     private AudioClip introSequenceAudioClip;
 
+
     /// <summary>
     /// Callback invoked through animations that the intro animation on the camera is done playing
     /// </summary>

@@ -439,9 +439,17 @@ PrefabInstance:
       value: 120
       objectReference: {fileID: 0}
     - target: {fileID: 4848552851056387715, guid: 27e5dff7528ea5147b3302be04998521, type: 3}
+      propertyPath: pasMaterial
+      value: 
+      objectReference: {fileID: 6497678700385164325}
+    - target: {fileID: 4848552851056387715, guid: 27e5dff7528ea5147b3302be04998521, type: 3}
       propertyPath: countdownTime
       value: 3
       objectReference: {fileID: 0}
+    - target: {fileID: 4848552851056387715, guid: 27e5dff7528ea5147b3302be04998521, type: 3}
+      propertyPath: outlineMaterial
+      value: 
+      objectReference: {fileID: 6497678700385164324}
     - target: {fileID: 4848552851056387715, guid: 27e5dff7528ea5147b3302be04998521, type: 3}
       propertyPath: musicAudioSource
       value: 
@@ -938,6 +946,16 @@ Transform:
 --- !u!4 &6497678700385164323 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8739239954006228439, guid: 5297366b48054824db4d65ddeea1e63c, type: 3}
+  m_PrefabInstance: {fileID: 6497678700385164321}
+  m_PrefabAsset: {fileID: 0}
+--- !u!23 &6497678700385164324 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 510562426363982149, guid: 5297366b48054824db4d65ddeea1e63c, type: 3}
+  m_PrefabInstance: {fileID: 6497678700385164321}
+  m_PrefabAsset: {fileID: 0}
+--- !u!23 &6497678700385164325 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 8880026536323341001, guid: 5297366b48054824db4d65ddeea1e63c, type: 3}
   m_PrefabInstance: {fileID: 6497678700385164321}
   m_PrefabAsset: {fileID: 0}
 --- !u!1660057539 &9223372036854775807
