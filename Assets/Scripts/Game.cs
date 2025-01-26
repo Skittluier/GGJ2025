@@ -18,9 +18,6 @@ public class Game : MonoBehaviour
     [SerializeField, Tooltip("Countdown time before starting the game")]
     private float countdownTime = 3;
 
-    [SerializeField, Tooltip("Text that shows that the players can start the game")]
-    private TextMeshProUGUI startGameText;
-
     [SerializeField, Tooltip("Animator that controls the in-game UI")]
     private Animator gameUIAnimator;
 
@@ -37,6 +34,12 @@ public class Game : MonoBehaviour
 
     [SerializeField]
     private GameObject[] countdownObjects;
+
+    [SerializeField, Tooltip("Materials belonging to the waterpas for appearance lerping.")]
+    private Renderer pasMaterial, outlineMaterial;
+
+    [SerializeField]
+    private float cutoutShaderAppearanceDuration = 1;
 
     [Header("Timer")]
     [SerializeField]
@@ -62,10 +65,13 @@ public class Game : MonoBehaviour
 
     [Header("Audio")]
     [SerializeField, Tooltip("The voice being played whenever the bubble is free.")]
-    private AudioResource bubbleVictoryAudioResource;
+    private AudioResource bubbleVoiceVictoryAudioResource;
 
     [SerializeField, Tooltip("The voice being played whenever the bubble loses.")]
-    private AudioResource bubbleLostAudioResource;
+    private AudioResource bubbleVoiceLostAudioResource;
+
+    [SerializeField, Tooltip("The SFX that will be played on game over.")]
+    private AudioResource bubbleLostAudioResource, bubbleVictoryAudioResource;
 
     [SerializeField, Tooltip("Music audio source")]
     private AudioSource musicAudioSource;
@@ -115,6 +121,8 @@ public class Game : MonoBehaviour
                     musicAudioSource.Play();
 
                 StartCoroutine(DoCountdown());
+                StartCoroutine(DoAnimateCutoutShader());
+
                 IEnumerator DoCountdown()
                 {
                     SetCountdownNumber(3);
@@ -135,6 +143,33 @@ public class Game : MonoBehaviour
 
                     //Disable countdown text and start the game!
                     countdownParentGameObject.gameObject.SetActive(false);
+                }
+
+                IEnumerator DoAnimateCutoutShader()
+                {
+                    float currVal = 0;
+
+                    Vector4 defaultNumbersValue = pasMaterial.material.GetVector("_Numbers");
+                    float defaultCutoffRadius = pasMaterial.material.GetFloat("_Cutoff_radius");
+
+                    float fromVal = 0;
+                    float toVal = 2;
+
+                    while (currVal < 1)
+                    {
+                        currVal += Time.deltaTime / cutoutShaderAppearanceDuration;
+
+                        pasMaterial.material.SetVector("_Numbers", new Vector4(Mathf.Lerp(fromVal, toVal, currVal), defaultNumbersValue.y, defaultNumbersValue.z, defaultNumbersValue.w));
+                        outlineMaterial.material.SetFloat("_Cutoff_radius", Mathf.Lerp(fromVal, toVal, currVal));
+
+                        if (currVal >= 1)
+                        {
+                            pasMaterial.material.SetVector("_Numbers", new Vector4(toVal, defaultNumbersValue.y, defaultNumbersValue.z, defaultNumbersValue.w));
+                            outlineMaterial.material.SetFloat("_Cutoff_radius", toVal);
+                        }
+
+                        yield return null;
+                    }
                 }
 
                 void SetCountdownNumber(int countdownNumber)
@@ -182,6 +217,7 @@ public class Game : MonoBehaviour
 
                 mainCameraAnimator.enabled = false;
 
+                GlobalAudio.Instance.PlayAudioResource(lostGame ? bubbleVoiceLostAudioResource : bubbleVoiceVictoryAudioResource);
                 GlobalAudio.Instance.PlayAudioResource(lostGame ? bubbleLostAudioResource : bubbleVictoryAudioResource);
                 CameraHandler.Instance.FocusOnPlayer();
 
