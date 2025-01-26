@@ -5,6 +5,7 @@ using System.Collections;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Audio;
+using UnityEngine.UI;
 
 public class Game : MonoBehaviour
 {
@@ -16,12 +17,6 @@ public class Game : MonoBehaviour
 
     [SerializeField, Tooltip("Countdown time before starting the game")]
     private float countdownTime = 3;
-
-    [SerializeField, Tooltip("Text component to show the countdown before starting the game")]
-    private TextMeshProUGUI countdownText;
-
-    [SerializeField, Tooltip("Text component to show the current time left for the round")]
-    private TextMeshProUGUI gameTimeText;
 
     [SerializeField, Tooltip("Text that shows that the players can start the game")]
     private TextMeshProUGUI startGameText;
@@ -36,6 +31,35 @@ public class Game : MonoBehaviour
 
     private int amountOfPlayersFinished;
 
+    [Header("Countdown")]
+    [SerializeField, Tooltip("Text component to show the countdown before starting the game")]
+    private GameObject countdownParentGameObject;
+
+    [SerializeField]
+    private GameObject[] countdownObjects;
+
+    [Header("Timer")]
+    [SerializeField]
+    private GameObject timerGameObject;
+
+    [SerializeField, Tooltip("Text component to show the current time left for the round")]
+    private TMP_Text gameTimeText;
+
+    /// <summary>
+    /// Timestamp for when the game round is over, is being set when the game start
+    /// </summary>
+    private float endGameTimestamp = 0f;
+    private float startingTimestamp;
+
+    [SerializeField]
+    private Image timerFillImage;
+
+    [SerializeField]
+    private Color timerStartFillColor, timerEndFillColor;
+
+    [SerializeField]
+    private TMP_Text timerText;
+
     [Header("Audio")]
     [SerializeField, Tooltip("The voice being played whenever the bubble is free.")]
     private AudioResource bubbleVictoryAudioResource;
@@ -47,20 +71,11 @@ public class Game : MonoBehaviour
     private AudioSource musicAudioSource;
 
     /// <summary>
-    /// Timestamp for starting the game
-    /// </summary>
-    private float startingTimestamp = 0f;
-
-    /// <summary>
-    /// Timestamp for when the game round is over, is being set when the game start
-    /// </summary>
-    private float endGameTimestamp = 0f;
-
-    /// <summary>
     /// The current GameState of the game
     /// </summary>
     internal GameState CurrentGameState = GameState.INTRO;
 
+    private bool isCountingDown = false;
     private bool lostGame = false;
 
 
@@ -82,9 +97,6 @@ public class Game : MonoBehaviour
     {
         //Set countdown state
         UpdateGameState(GameState.COUNTDOWN);
-
-        //Set countdown timestamp
-        startingTimestamp = countdownTime;
     }
 
     /// <summary>
@@ -95,47 +107,72 @@ public class Game : MonoBehaviour
         //If the game hasn't started, perform startup logic
         if (CurrentGameState == GameState.COUNTDOWN)
         {
-            if (!musicAudioSource.isPlaying)
-                musicAudioSource.Play();
-
-            //If a starting timestamp is present, apply game cooldown
-            if (startingTimestamp > 0)
+            if (!isCountingDown)
             {
-                //Sustract time yo
-                startingTimestamp = Mathf.Clamp(startingTimestamp - Time.deltaTime, 0, countdownTime);
+                isCountingDown = true;
 
-                //Apply text to countdown text
-                countdownText.gameObject.SetActive(true);
-                countdownText.text = string.Format("Starting game in: {0:0.0} seconds!", startingTimestamp);
-            }
-            else if (startingTimestamp <= 0)
-            {
-                //send start game signal to game UI
-                gameUIAnimator.SetTrigger("Start Game");
+                if (!musicAudioSource.isPlaying)
+                    musicAudioSource.Play();
 
-                //Disable countdown text and start the game!
-                countdownText.gameObject.SetActive(false);
+                StartCoroutine(DoCountdown());
+                IEnumerator DoCountdown()
+                {
+                    SetCountdownNumber(3);
+                    yield return new WaitForSeconds(1);
+                    SetCountdownNumber(2);
+                    yield return new WaitForSeconds(1);
+                    SetCountdownNumber(1);
+                    yield return new WaitForSeconds(1);
+                    SetCountdownNumber(0);
 
-                //Start the game already!
-                StartGame();
+                    //send start game signal to game UI
+                    gameUIAnimator.SetTrigger("Start Game");
+
+                    //Start the game already!
+                    StartGame();
+
+                    yield return new WaitForSeconds(1);
+
+                    //Disable countdown text and start the game!
+                    countdownParentGameObject.gameObject.SetActive(false);
+                }
+
+                void SetCountdownNumber(int countdownNumber)
+                {
+                    for (int i = 0; i < countdownObjects.Length; i++)
+                        countdownObjects[i].SetActive(countdownNumber == i);
+                }
             }
         }
         //Perform game logic for when the game is running
         else if (CurrentGameState == GameState.GAMEPLAY)
         {
-            //Lower the current game time
-            endGameTimestamp = Mathf.Clamp(endGameTimestamp - Time.deltaTime, 0, roundTime);
+            //Set countdown timestamp and activate everything once.
+            if (endGameTimestamp == 0)
+            {
+                startingTimestamp = Time.time;
+                endGameTimestamp = startingTimestamp + roundTime;
+                timerGameObject.SetActive(true);
+            }
 
             //Update amount of time left in the game on the in-game UI
-            gameTimeText.text = string.Format("You have: {0:0.0} seconds left!", endGameTimestamp);
+            float timePlaying = Time.time - startingTimestamp;
+
+            if (timePlaying > 0)
+                timerFillImage.fillAmount = 1 - (timePlaying / roundTime);
+
+            gameTimeText.text = string.Format("{0:0.0}", endGameTimestamp - Time.time);
+            timerFillImage.color = Color.Lerp(timerStartFillColor, timerEndFillColor, (timePlaying / roundTime));
 
             //If the gametime is getting below 0, the game round is over and the players have lost
-            if (endGameTimestamp <= 0)
+            if (endGameTimestamp - Time.time <= 0)
                 LoseGame();
         }
         //Outro logic
         else if (CurrentGameState == GameState.OUTRO)
         {
+            timerGameObject.SetActive(false);
+
             if (musicAudioSource.isPlaying)
                 musicAudioSource.Stop();
 
@@ -195,9 +232,6 @@ public class Game : MonoBehaviour
     {
         //Indicate that the game has started
         UpdateGameState(GameState.GAMEPLAY);
-
-        //Assign the round time
-        endGameTimestamp = roundTime;
     }
 
     /// <summary>

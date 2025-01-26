@@ -116,13 +116,16 @@ Material:
     - _ZWrite: 1
     m_Colors:
     - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
+    - _BubblePosition0: {r: 0, g: 0, b: 0, a: 0}
     - _Bubbula: {r: 0, g: 0, b: 0, a: 0}
-    - _Color: {r: 0.690566, g: 0.690566, b: 0.690566, a: 1}
-    - _Color_1: {r: 0.48235294, g: 0.5279166, b: 0.5529412, a: 0}
+    - _Color: {r: 0.6320754, g: 1, b: 0.74232376, a: 1}
+    - _Color_1: {r: 0.45985883, g: 0.5939437, b: 0.65882355, a: 0}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _Intersection: {r: 0, g: 0, b: 0, a: 0}
-    - _Numbers: {r: 0.93, g: 0.85, b: 0, a: 0}
+    - _Numbers: {r: 0.93, g: 0.85, b: -0.25, a: 0.85}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
+    - _Test_bubble: {r: -2.71, g: 0, b: 0, a: 0}
+    - _Test_bubble2: {r: 2.6, g: 0, b: 0, a: 0}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
 --- !u!114 &3847177512630691999
