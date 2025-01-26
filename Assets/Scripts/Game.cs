@@ -151,7 +151,7 @@ public class Game : MonoBehaviour
                     float currVal = 0;
 
                     Vector4 defaultNumbersValue = pasMaterial.material.GetVector("_Numbers");
-                    float defaultCutoffRadius = pasMaterial.material.GetFloat("_Cutoff_radius");
+                    float defaultCutoffRadius = outlineMaterial.material.GetFloat("_Cutoff_radius");
 
                     float fromVal = 0;
                     float toVal = 2;
