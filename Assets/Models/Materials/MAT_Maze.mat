@@ -118,8 +118,8 @@ Material:
     - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
     - _BubblePosition0: {r: 0, g: 0, b: 0, a: 0}
     - _Bubbula: {r: 0, g: 0, b: 0, a: 0}
-    - _Color: {r: 0.8325351, g: 1, b: 0.7830188, a: 1}
-    - _Color_1: {r: 0.48235294, g: 0.5279166, b: 0.5529412, a: 0}
+    - _Color: {r: 0.7552909, g: 1, b: 0.68700004, a: 1}
+    - _Color_1: {r: 0.45985883, g: 0.5939437, b: 0.65882355, a: 0}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _Intersection: {r: 0, g: 0, b: 0, a: 0}
     - _Numbers: {r: 0.93, g: 0.85, b: -0.25, a: 0.85}
