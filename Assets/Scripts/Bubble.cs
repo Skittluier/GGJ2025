@@ -39,6 +39,7 @@ public class Bubble : MonoBehaviour
     private AudioResource impactVoiceAudioResource, impactAudioResource;
     public bool RigidBodyIsSleeping = false;
 
+    public int BubbleID;
 
     /// <summary>
     /// The current expression of the bubble
@@ -71,7 +72,9 @@ public class Bubble : MonoBehaviour
         UpdateBillboarding();
 
         //Update bubble position in the world based on its player index
-        Shader.SetGlobalVector(string.Format("_BubblePosition{0}", player.ID), transform.position);
+        Shader.SetGlobalVector(string.Format("_BubblePosition{0}", BubbleID), transform.position);
+        //best hack ever
+        Shader.SetGlobalVector(string.Format("_BubblePosition1"), Vector3.one * 999999);
 
         if (expressionTimer > 0)
             expressionTimer = Mathf.Clamp(expressionTimer - Time.deltaTime, 0, 100);
@@ -149,6 +152,7 @@ public class Bubble : MonoBehaviour
     internal void Finish()
     {
         rigidbody.isKinematic = true;
+        Game.Instance.WinGame();
     }
 
     /// <summary>

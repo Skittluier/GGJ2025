@@ -9,7 +9,6 @@ namespace SpiritLevel
         public int ID;
         public string UUID;
         public PlayerInput Input = new PlayerInput();
-        public Bubble Bubble;
         public bool IsReady;
     }
 }

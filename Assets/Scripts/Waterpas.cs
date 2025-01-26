@@ -1,3 +1,4 @@
+using NUnit.Framework;
 using RUMBLE.Utilities;
 using SpiritLevel.Player;
 using System;
@@ -17,20 +18,6 @@ public class Waterpas : MonoBehaviour
     [SerializeField, Tooltip("Prefab of the bubble player")]
     internal Bubble bubblePrefab;
 
-    [Header("PID Settings")]
-
-    /// <summary>
-    /// Reference to the internal PID controller
-    /// </summary>
-    [SerializeField]
-    internal PIDControllerAngularVelocity angularPIDController;
-
-    /// <summary>
-    /// Determines the forcemode used for applying force
-    /// </summary>
-    [SerializeField, Tooltip("Determines the forcemode used for applying force")]
-    internal ForceMode forceMode;
-
     /// <summary>
     /// Multiplier used for torque
     /// </summary>
@@ -41,8 +28,6 @@ public class Waterpas : MonoBehaviour
     /// Input queried from update loop
     /// </summary>
     private Vector2 lastInput = Vector2.zero;
-
-    private Quaternion initialRotation;
 
     /// <summary>
     /// Called on the first active frame
@@ -57,26 +42,15 @@ public class Waterpas : MonoBehaviour
         }
 #endif
 
-        initialRotation = transform.rotation;
-
-        //Attach rigidbody
-        angularPIDController.AttachedRigidBody = rigidBody;
-
-        //Loop over all players and spawn their players
-        for (int i = 0; i < PlayerManager.Instance.Players.Count; i++)
+        //Spawn 2 new bubbles in the tube
+        for (int i = 0; i < 1; i++)
         {
             //Get spawn point for the player
             Transform spawnPoint = i == 0 ? spawnPositionPlayer1 : spawnPositionPlayer2;
 
             //Spawn a new bubble
             Bubble newBubble = Instantiate(bubblePrefab, spawnPoint.position, spawnPoint.rotation);
-
-            //Assign the spawned new bubble to the player
-            PlayerManager.Instance.Players[i].Bubble = newBubble;
-
-            //Stop at the second player for nows
-            if (i == 1)
-                return;
+            newBubble.BubbleID = i;
         }
     }
 
@@ -85,9 +59,9 @@ public class Waterpas : MonoBehaviour
     /// </summary>
     private void Update()
     {
-        ////Stop processing input if the game hasn't started yet
-        //if (Game.Instance?.CurrentGameState != Game.GameState.GAMEPLAY)
-        //    return;
+        //Stop processing input if the game hasn't started yet
+        if (Game.Instance?.CurrentGameState != Game.GameState.GAMEPLAY)
+            return;
 
         float horizontalInput = 0;
         float verticalInput = 0;
@@ -104,7 +78,9 @@ public class Waterpas : MonoBehaviour
         lastInput = new Vector2(horizontalInput, verticalInput);
     }
 
-
+    /// <summary>
+    /// Determines input type of the Waterpas
+    /// </summary>
     public ControlMode ActiveControlMode = ControlMode.LocalSpace;
     public enum ControlMode
     {
@@ -119,9 +95,9 @@ public class Waterpas : MonoBehaviour
     /// </summary>
     private void FixedUpdate()
     {
-        ////Stop processing input if the game hasn't started yet
-        //if (Game.Instance?.CurrentGameState != Game.GameState.GAMEPLAY)
-        //    return;
+        //Stop processing input if the game hasn't started yet
+        if (Game.Instance?.CurrentGameState != Game.GameState.GAMEPLAY)
+            return;
 
         if (ActiveControlMode == ControlMode.LocalSpace)
         {
@@ -175,6 +151,12 @@ public class Waterpas : MonoBehaviour
     private Vector3 internalRotation;
 
     /// <summary>
+    /// Final output multiplier for torque
+    /// </summary>
+    [Tooltip("Final output multiplier for torque")]
+    public float TorqueMultiplier = 0.1f;
+
+    /// <summary>
     /// Update gyro input data
     /// </summary>
     public void UpdateGyroInputDeltas()
@@ -212,16 +194,11 @@ public class Waterpas : MonoBehaviour
         //Sample average delta from the buffer
         Vector3 averageDelta = GetAverageDelta();
 
-        //Apply smoothing and steps on internal rotation based on input deltas
-        internalRotation.x = internalRotation.x + (averageDelta.x * Smoothing * Time.deltaTime * InputDeltaMultiplier);
-        internalRotation.y = internalRotation.y + (averageDelta.y * Smoothing * Time.deltaTime * InputDeltaMultiplier);
-        internalRotation.z = internalRotation.z + (averageDelta.z * Smoothing * Time.deltaTime * InputDeltaMultiplier);
-
-        //Set rigidbody position and rotation
-        rigidBody.rotation = Quaternion.Euler(internalRotation.z * outputMultipliersPerAxis.x,
-                                              0,
-                                              internalRotation.x * outputMultipliersPerAxis.z);
+        //Lock position on zero, it should never move anyway
         rigidBody.position = Vector3.zero;
+
+        rigidBody.AddTorque(transform.right * TorqueMultiplier * (averageDelta.z * Smoothing * Time.deltaTime * InputDeltaMultiplier), ForceMode.Impulse);
+        rigidBody.AddTorque(transform.forward * TorqueMultiplier * (averageDelta.x * Smoothing * Time.deltaTime * InputDeltaMultiplier), ForceMode.Impulse);
     }
 
     /// <summary>

@@ -24,7 +24,7 @@ public class CameraAnimationCallbacks : MonoBehaviour
     public void MakeBubbleCry()
     {
         GlobalAudio.Instance.PlayAudioResource(introSequenceAudioClip);
-        Bubble firstPlayerBubble = PlayerManager.Instance?.Players[0]?.Bubble;
+        Bubble firstPlayerBubble = FindAnyObjectByType<Bubble>();
 
         if (!firstPlayerBubble)
             return;

@@ -222,7 +222,7 @@ public class Game : MonoBehaviour
                 GlobalAudio.Instance.PlayAudioResource(lostGame ? bubbleLostAudioResource : bubbleVictoryAudioResource);
                 CameraHandler.Instance.FocusOnPlayer();
 
-                Bubble firstPlayerBubble = PlayerManager.Instance?.Players[0]?.Bubble;
+                Bubble firstPlayerBubble = FindAnyObjectByType<Bubble>(FindObjectsInactive.Include);
 
                 if (!firstPlayerBubble)
                     return;
@@ -281,15 +281,13 @@ public class Game : MonoBehaviour
     {
         amountOfPlayersFinished++;
 
-        if (amountOfPlayersFinished >= PlayerManager.Instance.Players.Count)
-            WinGame();
     }
 
     /// <summary>
     /// This function executes the winning sequence
     /// </summary>
     [ContextMenu("Win Game")]
-    private void WinGame()
+    public void WinGame()
     {
         //Indicate that the game has finished
         UpdateGameState(GameState.OUTRO);
