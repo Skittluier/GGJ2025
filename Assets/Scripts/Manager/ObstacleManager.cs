@@ -3,9 +3,10 @@
 public class ObstacleManager
 {
     public GameObject[] prefab;
-    public ObstacleSpawner[] objectSpawner; 
-    
-    public void Awake()
+    public ObstacleSpawner[] objectSpawner
+        ;
+    [ContextMenu("Spawning Objects")]
+    public void SpawnObjects()
     {
         foreach (ObstacleSpawner item in objectSpawner)
         {
