@@ -22,6 +22,11 @@ public class Trash : Obstacle
     public float ProgressAddingValue = 0.01f;
     [SerializeField]
     private GameObject shakeIndication;
+
+    [SerializeField]
+    private Sprite[] trashSprites;
+    [SerializeField]
+    private SpriteRenderer spriteRenderer;
     private void OnTriggerEnter(Collider collision)
     {
         var hitLayerMask = 1 << collision.gameObject.layer;
@@ -77,6 +82,12 @@ public class Trash : Obstacle
                     BreakObject();
                 }
             }
+
+            if(progressBar.value > 0 && progressBar.value <= 0.2) { }
+            if(progressBar.value > 0.2 && progressBar.value <= 0.4) { }
+            if(progressBar.value > 0.4 && progressBar.value <= 0.6) { }
+            if(progressBar.value > 0.6 && progressBar.value <= 0.8) { }
+            if(progressBar.value > 0.8) { }
         }
     }
 
