@@ -454,6 +454,8 @@ MonoBehaviour:
   timerGameObject: {fileID: 8317477842250945177}
   gameTimeText: {fileID: 3327644461175602621}
   timerFillImage: {fileID: 742194497827782374}
+  timerStartFillColor: {r: 0.7372549, g: 0.99607843, b: 0.36078432, a: 1}
+  timerEndFillColor: {r: 1, g: 0.36078432, b: 0.5921569, a: 1}
   timerText: {fileID: 3327644461175602621}
   bubbleVictoryAudioResource: {fileID: 8300000, guid: 73affd18dfd08d946a09e00c3ed43256, type: 3}
   bubbleLostAudioResource: {fileID: 6418180475301049370, guid: 7c19e60e5c2aaed419c31df373c9a08d, type: 2}
@@ -972,7 +974,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.7372549, g: 0.99607843, b: 0.36078432, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1

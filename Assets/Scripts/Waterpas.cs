@@ -1,12 +1,7 @@
-using NativeWebSocket;
 using RUMBLE.Utilities;
-using SpiritLevel.Networking;
 using SpiritLevel.Player;
 using System;
-using System.Collections;
-using UnityEditor.ShaderGraph.Internal;
 using UnityEngine;
-using static TMPro.SpriteAssetUtilities.TexturePacker_JsonArray;
 
 public class Waterpas : MonoBehaviour
 {
@@ -90,9 +85,9 @@ public class Waterpas : MonoBehaviour
     /// </summary>
     private void Update()
     {
-        //Stop processing input if the game hasn't started yet
-        if (Game.Instance?.CurrentGameState != Game.GameState.GAMEPLAY)
-            return;
+        ////Stop processing input if the game hasn't started yet
+        //if (Game.Instance?.CurrentGameState != Game.GameState.GAMEPLAY)
+        //    return;
 
         float horizontalInput = 0;
         float verticalInput = 0;
@@ -120,41 +115,13 @@ public class Waterpas : MonoBehaviour
     }
 
     /// <summary>
-    /// Clamp value for the rotation delta
-    /// </summary>
-    public float RotationDeltaClamp = 3;
-
-    /// <summary>
-    /// Current beta delta
-    /// </summary>
-    private float currentBetaDelta = 0f;
-
-    /// <summary>
-    /// Current gamma delta
-    /// </summary>
-    private float currentGammaDelta = 0f;
-
-    /// <summary>
-    /// Current gamma delta velocity
-    /// </summary>
-    private float deltaGammaVelocity;
-
-    /// <summary>
-    /// Current beta delta velocity
-    /// </summary>
-    private float deltaBetaVelocity;
-
-    public float Smooooooooth;
-    public float DeltaMultiplier;
-
-    /// <summary>
     /// Called every fixed frame, rotates the actual level
     /// </summary>
     private void FixedUpdate()
     {
-        //Stop processing input if the game hasn't started yet
-        if (Game.Instance?.CurrentGameState != Game.GameState.GAMEPLAY)
-            return;
+        ////Stop processing input if the game hasn't started yet
+        //if (Game.Instance?.CurrentGameState != Game.GameState.GAMEPLAY)
+        //    return;
 
         if (ActiveControlMode == ControlMode.LocalSpace)
         {
@@ -170,56 +137,133 @@ public class Waterpas : MonoBehaviour
         }
         else if (ActiveControlMode == ControlMode.GyroData)
         {
-            Vector3 gyroInput = Vector3.zero;
+            UpdateGyroInputDeltas();
+        }
+    }
 
-            //Just pick the input of the first player
-            if (PlayerManager.Instance.Players.Count == 1)
+    [Tooltip("Multiplier applied to all input deltas")]
+    public float InputDeltaMultiplier = 2;
+
+    [Tooltip("Minimum required delta to process a change")]
+    public float MinRequiredAngleDelta = 0.1f;
+
+    [Tooltip("Maximum clamped input angle")]
+    public float MaxAngle = 2;
+
+    [Tooltip("Multiplier applied to all input deltas")]
+    public float Smoothing;
+
+    [Tooltip("The amount of samples to store in the delta history")]
+    public int deltaHistory;
+
+    [Tooltip("Final multiplier of the output")]
+    public Vector3 outputMultipliersPerAxis;
+
+    /// <summary>
+    /// Amount of deltas stored as history
+    /// </summary>
+    private int storedDeltaCount = 0;
+
+    /// <summary>
+    /// Delta list, ordered for frames
+    /// </summary>
+    public Vector3[] deltaBuffer;
+
+    /// <summary>
+    /// Internal rotation counter
+    /// </summary>
+    private Vector3 internalRotation;
+
+    /// <summary>
+    /// Update gyro input data
+    /// </summary>
+    public void UpdateGyroInputDeltas()
+    {
+        float alpha = PlayerManager.Instance.Players[0].Input.Alpha;
+        float beta = PlayerManager.Instance.Players[0].Input.Beta;
+        float gamma = PlayerManager.Instance.Players[0].Input.Gamma;
+
+        float alphaDelta = PlayerManager.Instance.Players[0].Input.Alpha - PlayerManager.Instance.Players[0].Input.previousAlphaValue;
+        float betaDelta = 0; //We don't do betas
+        float gammaDelta = PlayerManager.Instance.Players.Count > 1 ? (PlayerManager.Instance.Players[1].Input.Gamma - PlayerManager.Instance.Players[1].Input.previousGammaValue) : 0;
+
+        float alphaDeltaSign = Mathf.Sign(alphaDelta);
+        float betaDeltaSign = Mathf.Sign(betaDelta);
+        float gammaDeltaSign = Mathf.Sign(gammaDelta);
+
+        //If the delta is too low, make it 0
+        if (Math.Abs(alphaDelta) < MinRequiredAngleDelta)
+            alphaDelta = 0;
+        if (Math.Abs(betaDelta) < MinRequiredAngleDelta)
+            betaDelta = 0;
+        if (Math.Abs(gammaDelta) < MinRequiredAngleDelta)
+            gammaDelta = 0;
+
+        if (Mathf.Abs(alphaDelta) > MaxAngle)
+            alphaDelta = MaxAngle * alphaDeltaSign;
+        if (Mathf.Abs(betaDelta) > MaxAngle)
+            betaDelta = MaxAngle * betaDeltaSign;
+        if (Mathf.Abs(gammaDelta) > MaxAngle)
+            gammaDelta = MaxAngle * gammaDeltaSign;
+
+        //Buffer the adjusted delta values
+        BufferDelta(new Vector3(alphaDelta, betaDelta, gammaDelta));
+
+        //Sample average delta from the buffer
+        Vector3 averageDelta = GetAverageDelta();
+
+        //Apply smoothing and steps on internal rotation based on input deltas
+        internalRotation.x = internalRotation.x + (averageDelta.x * Smoothing * Time.deltaTime * InputDeltaMultiplier);
+        internalRotation.y = internalRotation.y + (averageDelta.y * Smoothing * Time.deltaTime * InputDeltaMultiplier);
+        internalRotation.z = internalRotation.z + (averageDelta.z * Smoothing * Time.deltaTime * InputDeltaMultiplier);
+
+        //Set rigidbody position and rotation
+        rigidBody.rotation = Quaternion.Euler(internalRotation.z * outputMultipliersPerAxis.x,
+                                              0,
+                                              internalRotation.x * outputMultipliersPerAxis.z);
+        rigidBody.position = Vector3.zero;
+    }
+
+    /// <summary>
+    /// Returns the average delta movement from all of its history samples
+    /// </summary>
+    public Vector3 GetAverageDelta()
+    {
+        Vector3 averageDelta = Vector3.zero;
+
+        for (int i = 0; i < storedDeltaCount; i++)
+            averageDelta += deltaBuffer[i];
+
+        return averageDelta / storedDeltaCount;
+    }
+
+    /// <summary>
+    /// Buffers given input delta into the history
+    /// </summary>
+    /// <param name="delta"></param>
+    public void BufferDelta(Vector3 delta)
+    {
+        if (deltaBuffer == null || deltaBuffer.Length == 0 || deltaBuffer.Length != deltaHistory)
+            ResetBuffer();
+
+        for (int i = deltaBuffer.Length - 1; i > 0; i--)
+            deltaBuffer[i] = deltaBuffer[i - 1];
+
+        storedDeltaCount = Mathf.Clamp(storedDeltaCount + 1, 0, deltaBuffer.Length);
+        deltaBuffer[0] = delta;
+
+        void ResetBuffer()
+        {
+            storedDeltaCount = 0;
+
+            //Reset buffer without allocating new memory
+            if (deltaBuffer == null || deltaBuffer.Length == 0 || deltaBuffer.Length != deltaHistory)
+                deltaBuffer = new Vector3[deltaHistory];
+            else
             {
-                float gammaDelta = Mathf.Clamp(-(PlayerManager.Instance.Players[0].Input.Gamma - PlayerManager.Instance.Players[0].Input.previousGammaValue), -RotationDeltaClamp, RotationDeltaClamp) * DeltaMultiplier;
-
-                float betaDelta = Mathf.Clamp((PlayerManager.Instance.Players[0].Input.Alpha - PlayerManager.Instance.Players[0].Input.previousAlphaValue), -RotationDeltaClamp, RotationDeltaClamp) * DeltaMultiplier;
-                
-                if (Mathf.Abs(currentGammaDelta) <= 0.05f)
-                    currentGammaDelta = 0;
-
-                currentBetaDelta = Mathf.SmoothDamp(currentBetaDelta, betaDelta, ref deltaBetaVelocity, Time.deltaTime * Smooooooooth);
-                currentGammaDelta = Mathf.SmoothDamp(currentGammaDelta, gammaDelta, ref deltaGammaVelocity, Time.deltaTime * Smooooooooth);
-
-                //Gyro controls for singleplayer
-                gyroInput = new Vector3(currentGammaDelta, 0, currentBetaDelta);
+                for (int i = 0; i < deltaHistory; i++)
+                    deltaBuffer[i] = Vector3.zero;
             }
-            //If there are more then 2 players, split the input across 2 different players
-            else if (PlayerManager.Instance.Players.Count >= 2)
-            {
-                //Gyro controls for mutliplayer
-                gyroInput = new Vector3(-PlayerManager.Instance.Players[0].Input.Gamma, 0, /*-PlayerManager.Instance.Players[1].Input.Beta*/0);
-
-            }
-            //Get the desired output
-            Quaternion outputRotation = GyroToUnity(Quaternion.Euler(gyroInput));
-
-            //Update error in the angular PID controller
-            Vector3 diffAngles = GyroToUnity(Quaternion.Euler(gyroInput)).eulerAngles;
-
-            //CHeck for angle flips to make sure the fastest rotation is taken instead of turning complete circles
-            if (diffAngles.x >= 180)
-                diffAngles.x = -(360 - diffAngles.x);
-
-            if (diffAngles.y >= 180)
-                diffAngles.y = -(360 - diffAngles.y);
-
-            if (diffAngles.z >= 180)
-                diffAngles.z = -(360 - diffAngles.z);
-
-            //Update rotation controller error
-            angularPIDController.AttachedRigidBody = rigidBody;
-            angularPIDController.UpdateError(diffAngles, Time.fixedDeltaTime);
-
-            //Add torque based on error
-            rigidBody.AddTorque(transform.forward * diffAngles.x * torqueMultiplier, ForceMode.Impulse);
-
-            //Add torque based on error
-            //rigidBody.AddRelativeTorque(angularPIDController.ControlValue * Time.fixedDeltaTime * torqueMultiplier, ForceMode.Impulse);
         }
     }
 

@@ -55,6 +55,9 @@ public class Game : MonoBehaviour
     private Image timerFillImage;
 
     [SerializeField]
+    private Color timerStartFillColor, timerEndFillColor;
+
+    [SerializeField]
     private TMP_Text timerText;
 
     [Header("Audio")]
@@ -159,6 +162,7 @@ public class Game : MonoBehaviour
                 timerFillImage.fillAmount = 1 - (timePlaying / roundTime);
 
             gameTimeText.text = string.Format("{0:0.0}", endGameTimestamp - Time.time);
+            timerFillImage.color = Color.Lerp(timerStartFillColor, timerEndFillColor, (timePlaying / roundTime));
 
             //If the gametime is getting below 0, the game round is over and the players have lost
             if (endGameTimestamp - Time.time <= 0)
