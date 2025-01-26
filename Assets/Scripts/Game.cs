@@ -5,6 +5,7 @@ using System.Collections;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Audio;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class Game : MonoBehaviour
@@ -259,6 +260,9 @@ public class Game : MonoBehaviour
                 }
             }
         }
+
+        if (Input.GetKeyDown(KeyCode.Q))
+            SceneManager.LoadScene(0);
     }
 
     /// <summary>
