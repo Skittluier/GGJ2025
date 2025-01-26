@@ -157,7 +157,7 @@ public class Bubble : MonoBehaviour
         public Expression Expression;
 
         [Tooltip("Sprite for the expression of the player")]
-        public Texture2D ExpressionTexture;
+        public Texture ExpressionTexture;
     }
 
     /// <summary>

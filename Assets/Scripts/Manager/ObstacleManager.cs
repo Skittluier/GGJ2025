@@ -1,8 +1,7 @@
 ﻿using UnityEngine;
 
-public class ObstacleManager
+public class ObstacleManager : MonoBehaviour
 {
-    public GameObject[] prefab;
     public ObstacleSpawner[] objectSpawner
         ;
     [ContextMenu("Spawning Objects")]
