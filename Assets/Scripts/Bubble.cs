@@ -1,5 +1,6 @@
 using SpiritLevel;
 using UnityEngine;
+using UnityEngine.Audio;
 
 public class Bubble : MonoBehaviour
 {
@@ -16,10 +17,27 @@ public class Bubble : MonoBehaviour
     private Transform VisualsRoot;
 
     [SerializeField, Tooltip("References to the Renderers on the bubble")]
-    private SpriteRenderer rootRenderer, expressionRenderer;
+    private MeshRenderer rootRenderer, expressionRenderer;
 
     [SerializeField, Tooltip("All the possible face configurations for the bubble")]
     private ExpressionSet[] expressionSprites;
+
+    [SerializeField, Tooltip("This is for visuals which is EVERYTHING except for the twerk animation.")]
+    private GameObject generalVisualsGameObject;
+
+    [SerializeField, Tooltip("The game object with the twerk animation.")]
+    private GameObject twerkGameObject;
+
+    [SerializeField]
+    private AudioSource voiceAudioSource, environmentAudioSource;
+
+    [Header("Audio")]
+    [SerializeField, Tooltip("Minimum velocity needed for the impact sound to be invoked.")]
+    private float minImpactMagnitude;
+
+    [SerializeField]
+    private AudioResource impactVoiceAudioResource, impactAudioResource;
+
 
     /// <summary>
     /// The current expression of the bubble
@@ -67,7 +85,7 @@ public class Bubble : MonoBehaviour
         if (mainCam == null)
             return;
 
-        VisualsRoot.transform.forward = (mainCam.transform.position - VisualsRoot.transform.position);
+        VisualsRoot.transform.forward = (VisualsRoot.transform.position - mainCam.transform.position);
     }
 
     /// <summary>
@@ -90,11 +108,43 @@ public class Bubble : MonoBehaviour
         if (expressionSet.HasValue)
         {
             //Set expression
-            expressionRenderer.sprite = expressionSet.Value.ExpressionSprite;
+            expressionRenderer.material.SetTexture("_Texture2D", expressionSet.Value.ExpressionTexture);
 
             //Set expression timer
             expressionTimer = time;
         }
+    }
+
+    /// <summary>
+    /// Executes the twerk animation on the player.
+    /// </summary>
+    public void ExecuteTwerk()
+    {
+        generalVisualsGameObject.SetActive(false);
+        twerkGameObject.SetActive(true);
+    }
+
+    /// <summary>
+    /// For the impact sounds.
+    /// </summary>
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (Game.Instance != null && Game.Instance.CurrentGameState == Game.GameState.GAMEPLAY && collision.impulse.magnitude >= minImpactMagnitude && !voiceAudioSource.isPlaying)
+        {
+            voiceAudioSource.resource = impactVoiceAudioResource;
+            voiceAudioSource.Play();
+
+            environmentAudioSource.resource = impactAudioResource;
+            environmentAudioSource.Play();
+        }
+    }
+
+    /// <summary>
+    /// Makes the rigidbody kinematic.
+    /// </summary>
+    internal void Finish()
+    {
+        rigidbody.isKinematic = true;
     }
 
     /// <summary>
@@ -107,7 +157,7 @@ public class Bubble : MonoBehaviour
         public Expression Expression;
 
         [Tooltip("Sprite for the expression of the player")]
-        public Sprite ExpressionSprite;
+        public Texture2D ExpressionTexture;
     }
 
     /// <summary>

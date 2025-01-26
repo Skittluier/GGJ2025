@@ -23,6 +23,7 @@ public class Trash : Obstacle
     private bool startedTimer;
     public Slider progressBar;
     public float ProgressAddingValue = 0.01f;
+    [SerializeField]
     private GameObject shakeIndication;
     private void OnTriggerEnter(Collider collision)
     {
@@ -35,6 +36,7 @@ public class Trash : Obstacle
                 BubbleRigidbody = collision.gameObject.GetComponent<Rigidbody>();
                 BubbleRigidbody.Sleep();
                 canStartShaking = true;
+                shakeIndication.SetActive(true);
                 StartShaking();
             }
         }
@@ -97,7 +99,6 @@ public class Trash : Obstacle
         if (progressBar.value == 100)
         {
             progressBar.gameObject.SetActive(false);
-            gameObject.SetActive(false);
             Debug.Log("Break");
             UnityMessage<string> message = new UnityMessage<string>()
             {
@@ -108,7 +109,8 @@ public class Trash : Obstacle
             string data = Newtonsoft.Json.JsonConvert.SerializeObject(message);
             PlayerManager.Instance.SendData(data);
             BubbleRigidbody.WakeUp();
-
+            shakeIndication.SetActive(false);
+            gameObject.SetActive(false);
         }
     }
 }

@@ -1,7 +1,10 @@
+using SpiritLevel;
 using SpiritLevel.Networking;
 using SpiritLevel.Player;
+using System.Collections;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Audio;
 
 public class Game : MonoBehaviour
 {
@@ -26,6 +29,23 @@ public class Game : MonoBehaviour
     [SerializeField, Tooltip("Animator that controls the in-game UI")]
     private Animator gameUIAnimator;
 
+    private bool isPlayingOutro = false;
+
+    [SerializeField, Tooltip("A reference to the main camera's animator.")]
+    private Animator mainCameraAnimator;
+
+    private int amountOfPlayersFinished;
+
+    [Header("Audio")]
+    [SerializeField, Tooltip("The voice being played whenever the bubble is free.")]
+    private AudioResource bubbleVictoryAudioResource;
+
+    [SerializeField, Tooltip("The voice being played whenever the bubble loses.")]
+    private AudioResource bubbleLostAudioResource;
+
+    [SerializeField, Tooltip("Music audio source")]
+    private AudioSource musicAudioSource;
+
     /// <summary>
     /// Timestamp for starting the game
     /// </summary>
@@ -40,6 +60,9 @@ public class Game : MonoBehaviour
     /// The current GameState of the game
     /// </summary>
     internal GameState CurrentGameState = GameState.INTRO;
+
+    private bool lostGame = false;
+
 
     /// <summary>
     /// Called from the start, Starts the game right away on scene load
@@ -63,7 +86,7 @@ public class Game : MonoBehaviour
         //Set countdown timestamp
         startingTimestamp = countdownTime;
     }
-    
+
     /// <summary>
     /// Called every frame
     /// </summary>
@@ -72,6 +95,9 @@ public class Game : MonoBehaviour
         //If the game hasn't started, perform startup logic
         if (CurrentGameState == GameState.COUNTDOWN)
         {
+            if (!musicAudioSource.isPlaying)
+                musicAudioSource.Play();
+
             //If a starting timestamp is present, apply game cooldown
             if (startingTimestamp > 0)
             {
@@ -101,16 +127,64 @@ public class Game : MonoBehaviour
             endGameTimestamp = Mathf.Clamp(endGameTimestamp - Time.deltaTime, 0, roundTime);
 
             //Update amount of time left in the game on the in-game UI
-            gameTimeText.text = string.Format("You have: {0:0.0} seconds left!",endGameTimestamp);
+            gameTimeText.text = string.Format("You have: {0:0.0} seconds left!", endGameTimestamp);
 
             //If the gametime is getting below 0, the game round is over and the players have lost
-            if(endGameTimestamp <= 0)
+            if (endGameTimestamp <= 0)
                 LoseGame();
         }
         //Outro logic
         else if (CurrentGameState == GameState.OUTRO)
         {
+            if (musicAudioSource.isPlaying)
+                musicAudioSource.Stop();
 
+            if (!isPlayingOutro)
+            {
+                isPlayingOutro = true;
+
+                mainCameraAnimator.enabled = false;
+
+                GlobalAudio.Instance.PlayAudioResource(lostGame ? bubbleLostAudioResource : bubbleVictoryAudioResource);
+                CameraHandler.Instance.FocusOnPlayer();
+
+                Bubble firstPlayerBubble = PlayerManager.Instance?.Players[0]?.Bubble;
+
+                if (!firstPlayerBubble)
+                    return;
+
+                StartCoroutine(DoOutroAnimation());
+                IEnumerator DoOutroAnimation()
+                {
+                    if (!lostGame)
+                    {
+                        firstPlayerBubble.SetExpression(Bubble.Expression.Normal, 4.5f);
+                        yield return new WaitForSeconds(4.5f);
+
+                        firstPlayerBubble.ExecuteTwerk();
+                    }
+                    else
+                    {
+                        float expressionLength = 2;
+                        firstPlayerBubble.SetExpression(Bubble.Expression.Impact, expressionLength);
+
+                        float currValue = 0;
+                        Vector3 fromScale = firstPlayerBubble.transform.localScale;
+                        Vector3 toScale = Vector3.zero;
+
+                        while (currValue < 1)
+                        {
+                            currValue += Time.deltaTime / expressionLength;
+                            firstPlayerBubble.transform.localScale = Vector3.Lerp(fromScale, toScale, currValue);
+
+                            if (currValue >= 1)
+                                firstPlayerBubble.transform.localScale = toScale;
+
+                            yield return null;
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -127,9 +201,21 @@ public class Game : MonoBehaviour
     }
 
     /// <summary>
+    /// Registers a player win. When it's equal to the player count, then win the game.
+    /// </summary>
+    internal void PlayerWin()
+    {
+        amountOfPlayersFinished++;
+
+        if (amountOfPlayersFinished >= PlayerManager.Instance.Players.Count)
+            WinGame();
+    }
+
+    /// <summary>
     /// This function executes the winning sequence
     /// </summary>
-    public void WinGame()
+    [ContextMenu("Win Game")]
+    private void WinGame()
     {
         //Indicate that the game has finished
         UpdateGameState(GameState.OUTRO);
@@ -142,11 +228,13 @@ public class Game : MonoBehaviour
     /// <summary>
     /// This function executes the losing sequence
     /// </summary>
+    [ContextMenu("Lose Game")]
     private void LoseGame()
     {
         //Indicate that the game has finished
         UpdateGameState(GameState.OUTRO);
-    
+        lostGame = true;
+
         //Send lose signal to the Animator
         gameUIAnimator.SetTrigger("Lose Game");
     }
