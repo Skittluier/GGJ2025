@@ -10,13 +10,13 @@ namespace SpiritLevel.Player
         internal const float MAXIMUM_SHAKE_MAGNITUDE = 500.0f;
 
         [SerializeField]
-        private float previousAlphaValue;
+        internal float previousAlphaValue;
 
         [SerializeField]
-        private float previousBetaValue;
+        internal float previousBetaValue;
 
         [SerializeField]
-        private float previousGammaValue;
+        internal float previousGammaValue;
 
         [SerializeField]
         internal float Alpha, Beta, Gamma;

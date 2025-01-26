@@ -1,5 +1,10 @@
+using SpiritLevel;
+using SpiritLevel.Networking;
+using SpiritLevel.Player;
+using System.Collections;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Audio;
 
 public class Game : MonoBehaviour
 {
@@ -24,6 +29,21 @@ public class Game : MonoBehaviour
     [SerializeField, Tooltip("Animator that controls the in-game UI")]
     private Animator gameUIAnimator;
 
+    private bool isPlayingOutro = false;
+
+    [SerializeField, Tooltip("A reference to the main camera's animator.")]
+    private Animator mainCameraAnimator;
+
+    [Header("Audio")]
+    [SerializeField, Tooltip("The voice being played whenever the bubble is free.")]
+    private AudioResource bubbleVictoryAudioResource;
+
+    [SerializeField, Tooltip("The voice being played whenever the bubble loses.")]
+    private AudioResource bubbleLostAudioResource;
+
+    [SerializeField, Tooltip("Music audio source")]
+    private AudioSource musicAudioSource;
+
     /// <summary>
     /// Timestamp for starting the game
     /// </summary>
@@ -37,7 +57,10 @@ public class Game : MonoBehaviour
     /// <summary>
     /// The current GameState of the game
     /// </summary>
-    internal GameState CurrentGameState = GameState.Intro;
+    internal GameState CurrentGameState = GameState.INTRO;
+
+    private bool lostGame = false;
+
 
     /// <summary>
     /// Called from the start, Starts the game right away on scene load
@@ -47,7 +70,7 @@ public class Game : MonoBehaviour
         Instance = this;
 
         //Set intro state
-        CurrentGameState = GameState.Intro;
+        UpdateGameState(GameState.INTRO);
     }
 
     /// <summary>
@@ -56,20 +79,23 @@ public class Game : MonoBehaviour
     public void StartCountdownSequence()
     {
         //Set countdown state
-        CurrentGameState = GameState.Countdown;
+        UpdateGameState(GameState.COUNTDOWN);
 
         //Set countdown timestamp
         startingTimestamp = countdownTime;
     }
-    
+
     /// <summary>
     /// Called every frame
     /// </summary>
     private void Update()
     {
         //If the game hasn't started, perform startup logic
-        if (CurrentGameState == GameState.Countdown)
+        if (CurrentGameState == GameState.COUNTDOWN)
         {
+            if (!musicAudioSource.isPlaying)
+                musicAudioSource.Play();
+
             //If a starting timestamp is present, apply game cooldown
             if (startingTimestamp > 0)
             {
@@ -93,22 +119,70 @@ public class Game : MonoBehaviour
             }
         }
         //Perform game logic for when the game is running
-        else if (CurrentGameState == GameState.Gameplay)
+        else if (CurrentGameState == GameState.GAMEPLAY)
         {
             //Lower the current game time
             endGameTimestamp = Mathf.Clamp(endGameTimestamp - Time.deltaTime, 0, roundTime);
 
             //Update amount of time left in the game on the in-game UI
-            gameTimeText.text = string.Format("You have: {0:0.0} seconds left!",endGameTimestamp);
+            gameTimeText.text = string.Format("You have: {0:0.0} seconds left!", endGameTimestamp);
 
             //If the gametime is getting below 0, the game round is over and the players have lost
-            if(endGameTimestamp <= 0)
+            if (endGameTimestamp <= 0)
                 LoseGame();
         }
         //Outro logic
-        else if (CurrentGameState == GameState.Outro)
+        else if (CurrentGameState == GameState.OUTRO)
         {
+            if (musicAudioSource.isPlaying)
+                musicAudioSource.Stop();
 
+            if (!isPlayingOutro)
+            {
+                isPlayingOutro = true;
+
+                mainCameraAnimator.enabled = false;
+
+                GlobalAudio.Instance.PlayAudioResource(lostGame ? bubbleLostAudioResource : bubbleVictoryAudioResource);
+                CameraHandler.Instance.FocusOnPlayer();
+
+                Bubble firstPlayerBubble = PlayerManager.Instance?.Players[0]?.Bubble;
+
+                if (!firstPlayerBubble)
+                    return;
+
+                StartCoroutine(DoOutroAnimation());
+                IEnumerator DoOutroAnimation()
+                {
+                    if (!lostGame)
+                    {
+                        firstPlayerBubble.SetExpression(Bubble.Expression.Normal, 4.5f);
+                        yield return new WaitForSeconds(4.5f);
+
+                        firstPlayerBubble.ExecuteTwerk();
+                    }
+                    else
+                    {
+                        float expressionLength = 2;
+                        firstPlayerBubble.SetExpression(Bubble.Expression.Impact, expressionLength);
+
+                        float currValue = 0;
+                        Vector3 fromScale = firstPlayerBubble.transform.localScale;
+                        Vector3 toScale = Vector3.zero;
+
+                        while (currValue < 1)
+                        {
+                            currValue += Time.deltaTime / expressionLength;
+                            firstPlayerBubble.transform.localScale = Vector3.Lerp(fromScale, toScale, currValue);
+
+                            if (currValue >= 1)
+                                firstPlayerBubble.transform.localScale = toScale;
+
+                            yield return null;
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -118,7 +192,7 @@ public class Game : MonoBehaviour
     private void StartGame()
     {
         //Indicate that the game has started
-        CurrentGameState = GameState.Gameplay;
+        UpdateGameState(GameState.GAMEPLAY);
 
         //Assign the round time
         endGameTimestamp = roundTime;
@@ -127,10 +201,11 @@ public class Game : MonoBehaviour
     /// <summary>
     /// This function executes the winning sequence
     /// </summary>
+    [ContextMenu("Win Game")]
     public void WinGame()
     {
         //Indicate that the game has finished
-        CurrentGameState = GameState.Outro;
+        UpdateGameState(GameState.OUTRO);
 
         //Send win signal to the Animator
         gameUIAnimator.SetTrigger("Win Game");
@@ -140,13 +215,25 @@ public class Game : MonoBehaviour
     /// <summary>
     /// This function executes the losing sequence
     /// </summary>
+    [ContextMenu("Lose Game")]
     private void LoseGame()
     {
         //Indicate that the game has finished
-        CurrentGameState = GameState.Outro;
-    
+        UpdateGameState(GameState.OUTRO);
+        lostGame = true;
+
         //Send lose signal to the Animator
         gameUIAnimator.SetTrigger("Lose Game");
+    }
+
+    private void UpdateGameState(GameState newState)
+    {
+        UnityMessage<int> unityMessage = new UnityMessage<int>();
+        unityMessage.type = UnityMessageType.GAME_STATE_UPDATE;
+        unityMessage.data = (int)newState;
+
+        PlayerManager.Instance?.SendData(Newtonsoft.Json.JsonConvert.SerializeObject(unityMessage));
+        CurrentGameState = newState;
     }
 
     /// <summary>
@@ -154,9 +241,9 @@ public class Game : MonoBehaviour
     /// </summary>
     public enum GameState
     {
-        Intro,
-        Countdown,
-        Gameplay,
-        Outro,
+        INTRO,
+        COUNTDOWN,
+        GAMEPLAY,
+        OUTRO,
     }
 }

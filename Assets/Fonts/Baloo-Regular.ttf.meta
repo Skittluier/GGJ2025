@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: c86e87dcd383cf840ae335503bc7a322
+guid: 6422af607bc6a7a4da0353918ebecaf0
 TrueTypeFontImporter:
   externalObjects: {}
   serializedVersion: 4
@@ -9,7 +9,7 @@ TrueTypeFontImporter:
   characterPadding: 1
   includeFontData: 1
   fontNames:
-  - Arista 2.0 Alternate
+  - Baloo
   fallbackFontReferences: []
   customCharacters: 
   fontRenderingMode: 0
