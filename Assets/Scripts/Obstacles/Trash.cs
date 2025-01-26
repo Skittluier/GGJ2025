@@ -25,12 +25,14 @@ public class Trash : Obstacle
     private void OnTriggerEnter(Collider collision)
     {
         var hitLayerMask = 1 << collision.gameObject.layer;
-        if ((hitLayerMask & mask) == 1)
+        Debug.Log("Hitting " + collision.gameObject.layer + " " + ((hitLayerMask & mask) == 0));
+        if ((hitLayerMask & mask) > 0)
         {
             if (collision.TryGetComponent<Bubble>(out Bubble bubble))
             {
                 this.bubble = bubble;
                 BubbleRigidbody = collision.gameObject.GetComponent<Rigidbody>();
+                BubbleRigidbody.angularVelocity = Vector3.zero;
                 BubbleRigidbody.Sleep();
                 canStartShaking = true;
                 shakeIndication.SetActive(true);
