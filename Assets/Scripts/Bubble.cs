@@ -85,7 +85,7 @@ public class Bubble : MonoBehaviour
         if (mainCam == null)
             return;
 
-        VisualsRoot.transform.forward = (mainCam.transform.position - VisualsRoot.transform.position);
+        VisualsRoot.transform.forward = (VisualsRoot.transform.position - mainCam.transform.position);
     }
 
     /// <summary>
@@ -137,6 +137,14 @@ public class Bubble : MonoBehaviour
             environmentAudioSource.resource = impactAudioResource;
             environmentAudioSource.Play();
         }
+    }
+
+    /// <summary>
+    /// Makes the rigidbody kinematic.
+    /// </summary>
+    internal void Finish()
+    {
+        rigidbody.isKinematic = true;
     }
 
     /// <summary>

@@ -34,6 +34,8 @@ public class Game : MonoBehaviour
     [SerializeField, Tooltip("A reference to the main camera's animator.")]
     private Animator mainCameraAnimator;
 
+    private int amountOfPlayersFinished;
+
     [Header("Audio")]
     [SerializeField, Tooltip("The voice being played whenever the bubble is free.")]
     private AudioResource bubbleVictoryAudioResource;
@@ -199,10 +201,21 @@ public class Game : MonoBehaviour
     }
 
     /// <summary>
+    /// Registers a player win. When it's equal to the player count, then win the game.
+    /// </summary>
+    internal void PlayerWin()
+    {
+        amountOfPlayersFinished++;
+
+        if (amountOfPlayersFinished >= PlayerManager.Instance.Players.Count)
+            WinGame();
+    }
+
+    /// <summary>
     /// This function executes the winning sequence
     /// </summary>
     [ContextMenu("Win Game")]
-    public void WinGame()
+    private void WinGame()
     {
         //Indicate that the game has finished
         UpdateGameState(GameState.OUTRO);
