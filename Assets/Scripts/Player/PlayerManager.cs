@@ -6,6 +6,7 @@ namespace SpiritLevel.Player
     using System.Threading.Tasks;
     using Unity.Collections;
     using UnityEngine;
+    using UnityEngine.Audio;
 
     public class PlayerManager : Singleton<PlayerManager>
     {
@@ -16,6 +17,12 @@ namespace SpiritLevel.Player
 
         [field: SerializeField, ReadOnly]
         internal List<PlayerIdentity> Players { get; private set; } = new List<PlayerIdentity>();
+
+        [SerializeField]
+        private AudioResource playerJoinResource, playerLeftResource;
+
+        [SerializeField]
+        private AudioSource audioSource;
 
         internal delegate void OnPlayerJoinedMethod(PlayerIdentity player);
         internal OnPlayerJoinedMethod OnPlayerJoined;
@@ -86,11 +93,18 @@ namespace SpiritLevel.Player
                     PlayerIdentity player = new PlayerIdentity() { UUID = playerStatusUpdateData.data.uuid, ID = playerStatusUpdateData.data.id };
                     Players.Add(player);
 
+                    audioSource.resource = playerJoinResource;
+                    audioSource.Play();
+
                     OnPlayerJoined?.Invoke(player);
                 }
                 else if (sMessage.type == ServerMessageType.PLAYER_LEFT && PlayerExists(playerStatusUpdateData.data.uuid, out int inputIndex))
                 {
                     Players.RemoveAt(inputIndex);
+
+                    audioSource.resource = playerLeftResource;
+                    audioSource.Play();
+
                     OnPlayerLeft?.Invoke(playerStatusUpdateData.data.uuid);
                 }
             }

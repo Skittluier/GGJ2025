@@ -37,6 +37,7 @@ public class Bubble : MonoBehaviour
 
     [SerializeField]
     private AudioResource impactVoiceAudioResource, impactAudioResource;
+    public bool RigidBodyIsSleeping = false;
 
 
     /// <summary>
@@ -54,8 +55,11 @@ public class Bubble : MonoBehaviour
     /// </summary>
     private void FixedUpdate()
     {
-        //Add force to the bubble
-        rigidbody.AddForce(Vector3.up);
+        if (!RigidBodyIsSleeping)
+        {
+            //Add force to the bubble
+            rigidbody.AddForce(Vector3.up);
+        }
     }
 
     /// <summary>

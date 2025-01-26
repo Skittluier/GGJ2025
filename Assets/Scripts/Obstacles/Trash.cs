@@ -25,17 +25,17 @@ public class Trash : Obstacle
     private void OnTriggerEnter(Collider collision)
     {
         var hitLayerMask = 1 << collision.gameObject.layer;
-        Debug.Log("Hitting " + collision.gameObject.layer + " " + ((hitLayerMask & mask) == 0));
         if ((hitLayerMask & mask) > 0)
         {
             if (collision.TryGetComponent<Bubble>(out Bubble bubble))
             {
+
                 this.bubble = bubble;
                 BubbleRigidbody = collision.gameObject.GetComponent<Rigidbody>();
                 BubbleRigidbody.angularVelocity = Vector3.zero;
-                BubbleRigidbody.Sleep();
+                BubbleRigidbody.linearVelocity = Vector3.zero;
+                bubble.RigidBodyIsSleeping = true;
                 canStartShaking = true;
-                shakeIndication.SetActive(true);
                 StartShaking();
             }
         }
@@ -59,6 +59,7 @@ public class Trash : Obstacle
         startTime = Time.time;
         progressBar.value = 0;
         progressBar.gameObject.SetActive(true);
+        shakeIndication.SetActive(true);
         HapticFeedbackCall();
     }
 
@@ -71,7 +72,7 @@ public class Trash : Obstacle
                 magnitude = Mathf.Clamp(magnitude, PlayerInput.MINIMUM_SHAKE_MAGNITUDE, PlayerInput.MAXIMUM_SHAKE_MAGNITUDE);
                 progressBar.value += ProgressAddingValue * (magnitude * 0.01f);
 
-                if(progressBar.value > .95f)
+                if (progressBar.value > .95f)
                 {
                     BreakObject();
                 }
@@ -81,37 +82,37 @@ public class Trash : Obstacle
 
     private void HapticFeedbackCall()
     {
-        if (bubble.player.Input.IsShaking(out float magnitude))
+        Debug.Log(bubble);
+        Debug.Log(bubble.player);
+        Debug.Log(bubble.player.UUID);
+        UnityMessage<Dictionary<string, string>> message = new UnityMessage<Dictionary<string, string>>()
         {
-            UnityMessage<Dictionary<string, float>> message = new UnityMessage<Dictionary<string, float>>()
-            {
-                type = UnityMessageType.VIBRATION_START,
-                data = new Dictionary<string, float>()
+            type = UnityMessageType.VIBRATION_START,
+            data = new Dictionary<string, string>()
                 {
-                    { bubble.player.UUID, 250f }
+                    { "length", "250" },
                 }
-            };
+        };
 
-            string data = Newtonsoft.Json.JsonConvert.SerializeObject(message);
-            PlayerManager.Instance.SendData(data);
-        }
+        string data = Newtonsoft.Json.JsonConvert.SerializeObject(message);
+        PlayerManager.Instance.SendData(data);
     }
 
     private void BreakObject()
     {
-            progressBar.gameObject.SetActive(false);
-            Debug.Log("Break");
-            UnityMessage<string> message = new UnityMessage<string>()
-            {
-                type = UnityMessageType.VIBRATION_STOP,
-                data = bubble.player.UUID
-            };
+        progressBar.gameObject.SetActive(false);
+        shakeIndication.SetActive(false);
+        bubble.RigidBodyIsSleeping = false;
+        UnityMessage<Dictionary<string, string>> message = new UnityMessage<Dictionary<string, string>>()
+        {
+            type = UnityMessageType.VIBRATION_STOP,
 
-            string data = Newtonsoft.Json.JsonConvert.SerializeObject(message);
-            PlayerManager.Instance.SendData(data);
-            BubbleRigidbody.WakeUp();
-            shakeIndication.SetActive(false);
-            gameObject.SetActive(false);
-        
+        };
+
+        string data = Newtonsoft.Json.JsonConvert.SerializeObject(message);
+        PlayerManager.Instance.SendData(data);
+        BubbleRigidbody.WakeUp();
+        gameObject.SetActive(false);
+
     }
 }
